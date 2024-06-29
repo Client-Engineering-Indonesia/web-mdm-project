@@ -1,0 +1,92 @@
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.title-container {
+  display: flex;
+  flex-direction: column;
+  margin:10px 16px;
+}
+
+.astra{
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.data-fabric{
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.profile{
+  /* flexbox is for bikin element htmlnya lebih rapih */
+  display: flex; 
+  /* right justify */
+  justify-content: flex-end;
+
+}
+
+.name{
+  font-size: 14px;
+  font-weight: 500;
+  /* 10px 16px atas-bawah kanan-kiri */
+  margin:1px 14px;
+}
+.role{
+  font-size: 14px;
+  font-weight: 500;
+  /* 10px 16px atas-bawah kanan-kiri */
+  margin:3px 14px 1px 14px;
+}
+
+.button{
+  margin: 2px 32px;
+  padding-top: 10px;
+}
+.header{
+  display: flex;
+  justify-content: space-between;
+}
+
+.content{
+  margin: 68px 32px 40px 280px;
+
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
