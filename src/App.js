@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; //npm i react-router-dom
 import Data_Exchange from './components/data-exchange/Data_Exchange'; 
-import USERS from './components / users/USERS';
+import Users from './components/Users/Users';
 import{
   Header,
   HeaderName,
@@ -100,7 +100,7 @@ function App() {
 
           <Router>
               <Routes>
-                <Route path='/USERS' element={<USERS />} />
+                <Route path='/users' element={<Users />} />
               </Routes>
           </Router>
         </section>

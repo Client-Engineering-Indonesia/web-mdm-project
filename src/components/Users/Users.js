@@ -1,4 +1,4 @@
-import './USERS.css'
+import './Users.css'
 import React from 'react';
 import {
     DataTable,
@@ -111,10 +111,7 @@ const rows = [
     },
 ];
 
-
-
-
-function USERS() {
+function Users() {
     return (
         <section className='users'>
             <div className='users-content'>
@@ -191,4 +188,4 @@ function USERS() {
     );
 }
 
-export default USERS;
+export default Users;
