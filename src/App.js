@@ -34,7 +34,7 @@ function App() {
         <HeaderNavigation >
           <div className='profile'>
             <div>
-              <p className='role'>IBM - Admin</p>  
+              <p className='role'>Business Unit - Admin</p>  
               <p className='name'>user_name</p> 
             </div>
              

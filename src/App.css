@@ -58,6 +58,8 @@
   font-weight: 500;
   /* 10px 16px atas-bawah kanan-kiri */
   margin:1px 14px;
+  display: flex;
+  justify-content: center;
 }
 .role{
   font-size: 14px;
