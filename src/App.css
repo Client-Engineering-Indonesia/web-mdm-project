@@ -72,8 +72,10 @@
   margin: 2px 32px;
   padding-top: 10px;
 }
+
 .header{
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
 }
 
@@ -90,5 +92,6 @@
     transform: rotate(360deg);
   }
 }
+
 
 

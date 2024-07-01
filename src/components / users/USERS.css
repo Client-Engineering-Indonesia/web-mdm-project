@@ -1,0 +1,64 @@
+.search-bar {
+    display: flex;
+  }
+
+.menus {
+    display: flex;
+    gap: 40px;
+}
+  
+.menus p {
+    /* font-size: 30px; */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+}
+
+.menu-name-images img {
+    width: 50x;
+    height: 50px;
+}
+
+.menu-name-images {
+    display: flex;
+    gap: 10px;
+}
+
+.menu-name-images p {
+    font-weight: 400;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+
+
+.menu-name-images .cds--btn--icon-only {
+    justify-content: center;
+    padding: 0;
+    block-size: var(--cds-layout-size-height-local);
+    inline-size: var(--cds-layout-size-height-local);
+    padding-block-start: min((var(--cds-layout-size-height-local) - 1rem) / 2 - 0.0625rem, var(--temp-padding-block-max));
+}
+.menu-name-images .cds--btn--primary {
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    background-color: var(--cds-button-primary, white);
+    color: var(--cds-text-on-color, black);
+} 
+
+.menu-name-images .cds--btn--primary:hover {
+    background-color: #0f62fe;
+}
+
+.menu-name-images .cds--btn--icon-only:hover {
+    color: white;
+}
+
+.users-tables {
+    margin-top: 50px;
+}
