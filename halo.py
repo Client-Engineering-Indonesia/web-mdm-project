@@ -48,8 +48,8 @@ def grant_access():
             return jsonify({'error': 'No data provided'}), 400
 
         table_name = data.get('table_name')
-        table_schema = data.get('table_schema')
-        authid = data.get('authid')
+        table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM'
+        authid = 'achmad.fauzan@ibm.com'
 
         if not table_name or not table_schema or not authid:
             return jsonify({'error': 'Missing required parameters'}), 400
@@ -73,6 +73,39 @@ def grant_access():
         }
 
         response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/revoke_access/<authid>', methods=['DELETE'])
+def revoke_access(authid):
+    try:
+        # Retrieve query parameters
+        table_name = request.args.get('table_name')
+        table_schema = request.args.get('table_schema')
+
+        # Check if required query parameters are provided
+        if not table_name or not table_schema:
+            return jsonify({"error": "Missing required query parameters"}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users/{authid}?table_schema={table_schema}&table_name={table_name}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.delete(url, headers=headers, verify=False)
 
         if response.status_code == 200:
             return jsonify({'message': 'ok'}), 200
