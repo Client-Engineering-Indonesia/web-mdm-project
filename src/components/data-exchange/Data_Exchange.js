@@ -41,7 +41,7 @@ function Data_Exchange() {
     const onClick = async (index) => {
         const getToken = async () => {
             try {
-                const response = await axios.post(`${url2}/get_token`);
+                const response = await axios.post(`${url1}/get_token`);
                 return response.data.token; // Adjust this according to your API response structure
             } catch (error) {
                 console.error('Error fetching token:', error);
@@ -55,7 +55,7 @@ function Data_Exchange() {
         };
 
         try {
-            const response = await axios.post(`${url2}/grant_access`, {
+            const response = await axios.post(`${url1}/grant_access`, {
                 table_name: arrayObject[index].table_name, 
             }, { headers });
             console.log('Request successful:', response);
