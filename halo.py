@@ -141,5 +141,46 @@ def get_all_tables():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/create_user', methods=['POST'])
+def create_user():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/user'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        payload = {
+            "username": username,
+            "password": password
+        }
+
+        response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)
