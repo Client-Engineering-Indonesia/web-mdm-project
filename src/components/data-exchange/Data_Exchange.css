@@ -63,3 +63,23 @@
 .dropdown{
     padding-top: 8px;
 }
+
+.request-list{
+    padding:36px 0px 0px 12px;
+    display:flex;
+    flex-direction: column;
+    gap:24px;
+}
+
+.list-detail{
+    border: 2px solid #f0f0f0;
+    gap:12px;
+    padding:12px 12px;
+}
+
+.request-access{
+    /* make it to the most right */
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;;
+}

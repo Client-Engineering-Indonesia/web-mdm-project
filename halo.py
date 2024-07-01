@@ -49,7 +49,7 @@ def grant_access():
 
         table_name = data.get('table_name')
         table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM'
-        authid = 'achmad.fauzan@ibm.com'
+        authid = 'adi.wijaya@ibm.com'
 
         if not table_name or not table_schema or not authid:
             return jsonify({'error': 'Missing required parameters'}), 400

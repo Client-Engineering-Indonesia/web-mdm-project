@@ -50,7 +50,6 @@ function Data_Exchange() {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
         };
-        console.log('Token:', token);
 
         try {
             const response = await axios.post('http://127.0.0.1:5000/grant_access', {
@@ -109,11 +108,11 @@ function Data_Exchange() {
             {/* request list */}
             <div className='request-list'>
                 {arrayObject.map((item, index) => (
-                    <div key={index}>
+                    <div key={index} className='list-detail'>
                         <p>{item.table_name}</p>
                         <p>{item.business_name}</p>
                         <p>{item.description}</p>
-                        <Button onClick={() => onClick(index)} disabled={changeButton[index]}>Request Access</Button>
+                        <Button size='md'onClick={() => onClick(index)} disabled={changeButton[index]} className='request-access'>Request Access</Button>
                     </div>
                 ))}
             </div>
