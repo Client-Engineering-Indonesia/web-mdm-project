@@ -4,6 +4,9 @@ import { Button, Search, Dropdown } from '@carbon/react';
 import axios from 'axios'; // Import Axios
 import { useState } from 'react';
 
+const url1 = 'http://52.118.165.131:8443';
+const url2 = 'http://127.0.0.1:5000'
+
 function Data_Exchange() {
 
     const items = [
@@ -38,7 +41,7 @@ function Data_Exchange() {
     const onClick = async (index) => {
         const getToken = async () => {
             try {
-                const response = await axios.post('http://127.0.0.1:5000/get_token');
+                const response = await axios.post(`${url2}/get_token`);
                 return response.data.token; // Adjust this according to your API response structure
             } catch (error) {
                 console.error('Error fetching token:', error);
@@ -52,7 +55,7 @@ function Data_Exchange() {
         };
 
         try {
-            const response = await axios.post('http://127.0.0.1:5000/grant_access', {
+            const response = await axios.post(`${url2}/grant_access`, {
                 table_name: arrayObject[index].table_name, 
             }, { headers });
             console.log('Request successful:', response);
