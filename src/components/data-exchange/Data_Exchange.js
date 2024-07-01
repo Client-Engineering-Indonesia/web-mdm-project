@@ -1,6 +1,8 @@
 import './Data_Exchange.css';
 import React from 'react';
-import { DataTable, Button, Search, Dropdown } from '@carbon/react';
+import { Button, Search, Dropdown } from '@carbon/react';
+import axios from 'axios'; // Import Axios
+import { useState } from 'react';
 
 function Data_Exchange() {
 
@@ -15,7 +17,55 @@ function Data_Exchange() {
             text: 'Business Unit 2',
             tagId: '16'
         },
-        ];
+    ];
+    
+    const arrayObject=[
+        {
+            table_name:'BU_A_CUSTOMER',
+            business_name:'Business Unit 1',
+            description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
+        {
+            table_name:'BU_B_CUSTOMER',
+            business_name:'Business Unit 2',
+            description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        }
+    ];
+
+    
+    const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
+    console.log(changeButton);
+    const onClick = async (index) => {
+        const getToken = async () => {
+            try {
+                const response = await axios.post('http://127.0.0.1:5000/get_token');
+                return response.data.token; // Adjust this according to your API response structure
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                throw error;
+            }
+          }
+          const token = await getToken(); // Get the token first
+          const headers = {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+        };
+        console.log('Token:', token);
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/grant_access', {
+                table_name: arrayObject[index].table_name, 
+            }, { headers });
+            console.log('Request successful:', response);
+            const newChangeButton = [...changeButton];
+            newChangeButton[index] = true;
+            setChangeButton(newChangeButton);
+        } catch (error) {
+            console.error('Error making request:', error);
+        }
+    };
+
+
   return (
     <section className='data-exchange'>
         {/* categories and vendors */}
@@ -37,24 +87,38 @@ function Data_Exchange() {
 
         {/* content */}
         <section className='data-exchange-content'>
+            {/* product catalog */}
             <div className= 'product-catalog'>
                 <div className='title'>
-                    <p>PRODUCT CATALOG</p>
+                    <p className='product-catalog-title'>PRODUCT CATALOG</p>
                     <Button size='md'>Request New Data Set</Button>
                 </div>
-                <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} onKeyDown={() => {}} />
-                <div className='sort'>
-                    <p>All Data Product (1000 Results)</p>
-                    <p>Showing 1 of 50</p>
-                    <div>
-                        <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} />
+                <div className='title-content'>
+                    <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} onKeyDown={() => {}} />
+                    <div className='sort'>
+                        <p>All Data Product (1000 Results)</p>
+                        <p>Showing 1 of 50</p>
+                        <div className='dropdown'>
+                            <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} />
+                        </div>
                     </div>
                 </div>
-
             </div>
+            {/* product catalog */}
+
+            {/* request list */}
             <div className='request-list'>
-
+                {arrayObject.map((item, index) => (
+                    <div key={index}>
+                        <p>{item.table_name}</p>
+                        <p>{item.business_name}</p>
+                        <p>{item.description}</p>
+                        <Button onClick={() => onClick(index)} disabled={changeButton[index]}>Request Access</Button>
+                    </div>
+                ))}
             </div>
+            {/* request list */}
+
         </section>
         {/* content */}
 

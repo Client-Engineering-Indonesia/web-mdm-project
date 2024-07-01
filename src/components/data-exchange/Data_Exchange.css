@@ -43,5 +43,23 @@
 }
 
 .product-catalog{
+    display:flex;
+    flex-direction:column;
+    /* gap harus didahului dengan display flex dan flex direction */
+    gap:16px; 
+}
+
+.product-catalog-title{
+    padding-top: 9px;
+}
+
+.title-content{
+    padding-left: 12px;
+    display:flex;
+    flex-direction: column;
     gap:16px;
+}
+
+.dropdown{
+    padding-top: 8px;
 }
