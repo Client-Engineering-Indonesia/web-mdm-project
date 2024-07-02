@@ -33,7 +33,17 @@ function Data_Exchange() {
             table_name:'BU_B_CUSTOMER',
             business_name:'Business Unit 2',
             description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
-        }
+        },
+        {
+            table_name:'BU_A_B_Joined',
+            business_name:'Business Unit 3',
+            description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
+        {
+            table_name:'CUSTOMER_TEST',
+            business_name:'Business Unit 4',
+            description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
     ];
 
     
