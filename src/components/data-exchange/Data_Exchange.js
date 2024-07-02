@@ -58,10 +58,12 @@ function Data_Exchange() {
 
     useEffect(() => {
         // Save button state to cookies whenever it changes
-        Cookies.set('buttonState', JSON.stringify(changeButton), { expires:100000});
+        Cookies.set('buttonState', JSON.stringify(changeButton), { expires:0.00001});
     }, [changeButton]);
     
     console.log(changeButton);
+    console.log(arrayObject.length);
+    
     const onClick = async (index) => {
         const getToken = async () => {
             try {
