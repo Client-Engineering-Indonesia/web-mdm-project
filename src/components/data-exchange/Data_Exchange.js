@@ -2,7 +2,8 @@ import './Data_Exchange.css';
 import React from 'react';
 import { Button, Search, Dropdown } from '@carbon/react';
 import axios from 'axios'; // Import Axios
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 const url1 = 'http://52.118.165.131:8443';
 const url2 = 'http://127.0.0.1:5000'
@@ -36,12 +37,25 @@ function Data_Exchange() {
     ];
 
     
-    const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
+    // const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
+    // Load button state from cookies
+    const loadButtonState = () => {
+        const savedState = Cookies.get('buttonState');
+        return savedState ? JSON.parse(savedState) : Array(arrayObject.length).fill(false);
+    };
+
+    const [changeButton, setChangeButton] = useState(loadButtonState);
+
+    useEffect(() => {
+        // Save button state to cookies whenever it changes
+        Cookies.set('buttonState', JSON.stringify(changeButton), { expires:100000});
+    }, [changeButton]);
+    
     console.log(changeButton);
     const onClick = async (index) => {
         const getToken = async () => {
             try {
-                const response = await axios.post(`${url2}/get_token`);
+                const response = await axios.post(`${url1}/get_token`);
                 return response.data.token; // Adjust this according to your API response structure
             } catch (error) {
                 console.error('Error fetching token:', error);
@@ -55,16 +69,28 @@ function Data_Exchange() {
         };
 
         try {
-            const response = await axios.post(`${url2}/grant_access`, {
-                table_name: arrayObject[index].table_name, 
-            }, { headers });
-            console.log('Request successful:', response);
+            if (changeButton[index] === false) {
+                const response = await axios.post(`${url1}/grant_access`, {
+                    table_name: arrayObject[index].table_name,
+                }, { headers });
+                console.log('Request successful:', response);
+            } else {
+                const table_name = arrayObject[index].table_name;
+                const table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM';
+                const response = await axios.delete(`${url1}/revoke_access/adi.wijaya@ibm.com`, {
+                    headers: headers,
+                    params: { table_name, table_schema }
+                });
+                console.log('Revoke successful:', response);
+            }
+
             const newChangeButton = [...changeButton];
-            newChangeButton[index] = true;
+            newChangeButton[index] = !newChangeButton[index];
             setChangeButton(newChangeButton);
         } catch (error) {
-            console.error('Error making request:', error);
+            console.error('Error making request:', error.response ? error.response.data : error.message);
         }
+
     };
 
 
@@ -115,7 +141,8 @@ function Data_Exchange() {
                         <p>{item.table_name}</p>
                         <p>{item.business_name}</p>
                         <p>{item.description}</p>
-                        <Button size='md'onClick={() => onClick(index)} disabled={changeButton[index]} className='request-access'>Request Access</Button>
+                        {changeButton[index]===false && <Button size='md'onClick={() => onClick(index)} className='request-access'>Request Access</Button>} 
+                        {changeButton[index]===true && <Button size='md'onClick={() => onClick(index)} className='request-access'>Revoke</Button>} 
                     </div>
                 ))}
             </div>
