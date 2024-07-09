@@ -1,5 +1,5 @@
 import './Endpoint.css'
-import React from 'react';
+import { React, useState } from 'react';
 import {
     DataTable,
     Table,
@@ -8,118 +8,128 @@ import {
     TableHeader,
     TableBody,
     TableCell,
-    Button, Search, Dropdown, IconButton, Pagination
+    Button, Search, Dropdown, IconButton, Pagination, Modal, Select, SelectItem, TextInput
 } from '@carbon/react';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Add, CopyFile, TrashCan, Edit, Power } from '@carbon/icons-react';
 
+export default function ENDPOINT() {
 
-const headers = [
-    {
-        key: 'EndpointName',
-        header: 'Endpoint Name',
-    },
-   {
-        key: 'Status',
-        header: 'Status',
-   },
-   {
-        key: 'Engine',
-        header: 'Engine',
-    },
-    {
-        key: 'Hostname',
-        header: 'Hostname',
-    },
-    {
-        key: 'Port',
-        header: 'Port',
-    },
-    {
-        key: 'DatabaseName',
-        header: 'Database Name',
-    },
-    {
-        key: 'UserAcess',
-        header: 'User Access',
-    },
-    {
-        key: 'CreatedAt',
-        header: 'Created At',
-    },
-    {
-        key: 'Subscribed',
-        header: 'Subscribed',
-    }
-];
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-const rows = [
-    {
-        id: 'a',
-        EndpointName: 'Endpoint 1',
-        Status: 'Active',
-        Engine: 'Postgres',
-        Hostname: 'localhost',
-        Port: '5432',
-        DatabaseName: 'db1',
-        UserAcess: 'user1',
-        CreatedAt: '2021-07-01',
-        Subscribed: 'TRUE'
-    },
-    {
-        id: 'b',
-        EndpointName: 'Endpoint 2',
-        Status: 'Active',
-        Engine: 'Postgres',
-        Hostname: 'localhost',
-        Port: '5432',
-        DatabaseName: 'db2',
-        UserAcess: 'user2',
-        CreatedAt: '2021-07-02',
-        Subscribed: 'TRUE'
-    },
-    {
-        id: 'c',
-        EndpointName: 'Endpoint 3',
-        Status: 'Active',
-        Engine: 'Postgres',
-        Hostname: 'localhost',
-        Port: '5432',
-        DatabaseName: 'db3',
-        UserAcess: 'user3',
-        CreatedAt: '2021-07-03',
-        Subscribed: 'TRUE'
-    },
-    {
-        id: 'd',
-        EndpointName: 'Endpoint 4',
-        Status: 'Active',
-        Engine: 'Postgres',
-        Hostname: 'localhost',
-        Port: '5432',
-        DatabaseName: 'db4',
-        UserAcess: 'user4',
-        CreatedAt: '2021-07-04',
-        Subscribed: 'TRUE'
-    },
-    {
-        id: 'e',
-        EndpointName: 'Endpoint 5',
-        Status: 'Active',
-        Engine: 'Postgres',
-        Hostname: 'localhost',
-        Port: '5432',
-        DatabaseName: 'db5',
-        UserAcess: 'user5',
-        CreatedAt: '2021-07-05',
-        Subscribed: 'TRUE'
-    },
-];
+    const toggleModal = () => {
+        setIsModalOpen(prevState => !prevState);
+    };
+
+    const submithandler = () => {
+        console.log('submit');
+        setIsModalOpen(false);
+    };
+
+    const headers = [
+        {
+            key: 'EndpointName',
+            header: 'Endpoint Name',
+        },
+        {
+            key: 'Status',
+            header: 'Status',
+        },
+        {
+            key: 'Engine',
+            header: 'Engine',
+        },
+        {
+            key: 'Hostname',
+            header: 'Hostname',
+        },
+        {
+            key: 'Port',
+            header: 'Port',
+        },
+        {
+            key: 'DatabaseName',
+            header: 'Database Name',
+        },
+        {
+            key: 'UserAcess',
+            header: 'User Access',
+        },
+        {
+            key: 'CreatedAt',
+            header: 'Created At',
+        },
+        {
+            key: 'Subscribed',
+            header: 'Subscribed',
+        }
+    ];
+
+    const rows = [
+        {
+            id: 'a',
+            EndpointName: 'Endpoint 1',
+            Status: 'Active',
+            Engine: 'Postgres',
+            Hostname: 'localhost',
+            Port: '5432',
+            DatabaseName: 'db1',
+            UserAcess: 'user1',
+            CreatedAt: '2021-07-01',
+            Subscribed: 'TRUE'
+        },
+        {
+            id: 'b',
+            EndpointName: 'Endpoint 2',
+            Status: 'Active',
+            Engine: 'Postgres',
+            Hostname: 'localhost',
+            Port: '5432',
+            DatabaseName: 'db2',
+            UserAcess: 'user2',
+            CreatedAt: '2021-07-02',
+            Subscribed: 'TRUE'
+        },
+        {
+            id: 'c',
+            EndpointName: 'Endpoint 3',
+            Status: 'Active',
+            Engine: 'Postgres',
+            Hostname: 'localhost',
+            Port: '5432',
+            DatabaseName: 'db3',
+            UserAcess: 'user3',
+            CreatedAt: '2021-07-03',
+            Subscribed: 'TRUE'
+        },
+        {
+            id: 'd',
+            EndpointName: 'Endpoint 4',
+            Status: 'Active',
+            Engine: 'Postgres',
+            Hostname: 'localhost',
+            Port: '5432',
+            DatabaseName: 'db4',
+            UserAcess: 'user4',
+            CreatedAt: '2021-07-04',
+            Subscribed: 'TRUE'
+        },
+        {
+            id: 'e',
+            EndpointName: 'Endpoint 5',
+            Status: 'Active',
+            Engine: 'Postgres',
+            Hostname: 'localhost',
+            Port: '5432',
+            DatabaseName: 'db5',
+            UserAcess: 'user5',
+            CreatedAt: '2021-07-05',
+            Subscribed: 'TRUE'
+        },
+    ];
 
 
-
-
-function ENDPOINT() {
     return (
         <section className='endpoint'>
 
@@ -136,7 +146,7 @@ function ENDPOINT() {
                 <div className='options'>
                     <div className='menus'>
                         <div className='menu-name-images'>
-                            <IconButton label="add">
+                            <IconButton label="add" kind='primary' onClick={toggleModal}>
                                 <Add className='button-add' />
                             </IconButton>
                             <p>Add</p>
@@ -212,8 +222,34 @@ function ENDPOINT() {
                     />
                 </div>
             </div>
+
+            <div className='modal'>
+                <Modal
+                    open={isModalOpen}
+                    modalHeading="Add New Endpoint"
+                    primaryButtonText="Submit"
+                    secondaryButtonText="Cancel"
+                    onRequestClose={toggleModal}
+                    onRequestSubmit={submithandler}
+                >
+                    <TextInput data-modal-primary-focus id="EndpointName" labelText=" Endpoint Name" placeholder="" />
+                    <TextInput data-modal-primary-focus id="Status" labelText="Status" placeholder="" />
+                    <Select id="select-1" defaultValue="MSSQL SERVER" labelText="Engine">
+                        <SelectItem value="MSSQL SERVER" text="MSSQL SERVER" />
+                        <SelectItem value="ORACLE" text="ORACLE" />
+                        <SelectItem value="MYSQL" text="MYSQL" />
+                        <SelectItem value="Postgresql" text="Postgresql" />
+                    </Select>
+                    <TextInput data-modal-primary-focus id="Hostname" labelText="Hostname" placeholder="" />
+                    <TextInput data-modal-primary-focus id="Port" labelText="Port" placeholder="" />
+                    <TextInput data-modal-primary-focus id="DatabaseName" labelText="Database Name" placeholder="" />
+                    <TextInput data-modal-primary-focus id="SchemaName" labelText="Schema Name" placeholder="" />
+                    <TextInput data-modal-primary-focus id="UserName" labelText="Username" placeholder="" />
+                    <TextInput data-modal-primary-focus id="Password" labelText="Password" placeholder="" />
+                </Modal>
+            </div>
         </section>
+
+
     );
 }
-
-export default ENDPOINT;

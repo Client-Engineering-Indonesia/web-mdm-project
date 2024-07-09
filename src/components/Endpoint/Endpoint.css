@@ -111,3 +111,20 @@
     will-change: scroll-position;
     gap: 50px;
 }
+
+
+.modal .cds--form-item {
+    font-size: var(--cds-body-compact-01-font-size, 0.875rem);
+    font-weight: var(--cds-body-compact-01-font-weight, 400);
+    line-height: var(--cds-body-compact-01-line-height, 1.28572);
+    letter-spacing: var(--cds-body-compact-01-letter-spacing, 0.16px);
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.modal .cds--modal-header h3 {
+    font-size: 30px;
+}
