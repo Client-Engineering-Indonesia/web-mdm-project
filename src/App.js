@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; //npm i react-router-dom
 import Data_Exchange from './components/data-exchange/Data_Exchange'; 
 import Users from './components/Users/Users';
+import Catalog from './components/catalog/Catalog';
 import Endpoint from './components/Endpoint/Endpoint';
 import{
   Header,
@@ -64,7 +65,7 @@ function App() {
               <SideNavMenuItem href="/endpoint">
                 Endpoint
               </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/catalog">
                 Catalog
               </SideNavMenuItem>
             </SideNavMenu>
@@ -93,27 +94,31 @@ function App() {
 
         <section className='content'>
           {/* routing below */}
-          <Router>
-              <Routes>
-                <Route path="/data_exchange" element={<Data_Exchange />} />
-              </Routes>
-          </Router>
+            <Router>
+                <Routes>
+                  <Route path="/data_exchange" element={<Data_Exchange />} />
+                </Routes>
+            </Router>
 
-          <Router>
-              <Routes>
-                <Route path='/users' element={<Users />} />
-              </Routes>
-          </Router>
-          <Router>
-              <Routes>
-                <Route path='/endpoint' element={<Endpoint />} />
-              </Routes>
-          </Router>
+            <Router>
+                <Routes>
+                  <Route path='/users' element={<Users />} />
+                </Routes>
+            </Router>
+
+            <Router>
+                <Routes>
+                  <Route path='/catalog' element={<Catalog />} />
+                </Routes>
+            </Router>
+            <Router>
+                <Routes>
+                  <Route path='/endpoint' element={<Endpoint />} />
+                </Routes>
+            </Router>
         </section>
-
   </>
   );
-  
 }
 
 export default App;
