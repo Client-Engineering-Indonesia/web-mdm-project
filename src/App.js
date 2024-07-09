@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; //npm i react-router-dom
 import Data_Exchange from './components/data-exchange/Data_Exchange'; 
 import Users from './components/Users/Users';
+import Catalog from './components/catalog/Catalog';
 import{
   Header,
   HeaderName,
@@ -63,7 +64,7 @@ function App() {
               <SideNavMenuItem href="https://www.carbondesignsystem.com/">
                 Endpoint
               </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/catalog">
                 Catalog
               </SideNavMenuItem>
             </SideNavMenu>
@@ -101,6 +102,12 @@ function App() {
           <Router>
               <Routes>
                 <Route path='/users' element={<Users />} />
+              </Routes>
+          </Router>
+
+          <Router>
+              <Routes>
+                <Route path='/catalog' element={<Catalog />} />
               </Routes>
           </Router>
         </section>

@@ -1,0 +1,49 @@
+.db-tile {
+    width: inherit;
+    padding: 2.5rem 2.5rem 3rem 2.5rem;
+    /* margin-bottom: 2rem; */
+    margin-top: 2rem;
+}
+
+.table-tile {
+    width: inherit;
+    height: 100%;
+    padding: 3.5rem 2.5rem 4rem 2.5rem;
+    margin-top: 2rem;
+}
+
+.heading-text {
+    font: 'IBM Plex Sans';
+    font-size: 30px;
+    margin-bottom: 1.5rem;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-bottom: 2rem;
+}
+
+.column-editor-tile {
+    width: inherit;
+    height: 100%;
+}
+
+.cds--form-item.cds--checkbox-wrapper {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.cds--data-table .cds--table-header-label {
+    text-align: center !important;
+}
+
+.cds--data-table th, .cds--data-table td {
+    text-align: center !important;
+}
+
+tr {
+  border-left: 1px solid #dcdcdc !important; 
+  border-right: 1px solid #dcdcdc !important; 
+}
