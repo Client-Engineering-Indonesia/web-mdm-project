@@ -9,7 +9,8 @@
     gap: 40px;
 }
   
-.users-content{
+.endpoint-content{
+    margin-top: 50px;
     border: 2px solid #f0f0f0;
 }
 
@@ -83,13 +84,30 @@
     background-color: #393939;
 }
 
-.users-tables {
+.endpoint-tables {
     margin-top: 50px;
     max-width: 97%;
     margin-left: 20px;
 }
 
 
-.users-tables .cds--pagination {
+.endpoint-tables .cds--pagination {
    margin-bottom: 25px;
+}
+
+.endpoint-tab .cds--tabs {
+    display: flex;
+    margin-top: 90px;
+    justify-content: center;
+}
+
+
+.endpoint-tab .cds--tabs .cds--tab--list {
+    display: flex;
+    inline-size: auto;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    will-change: scroll-position;
+    gap: 50px;
 }

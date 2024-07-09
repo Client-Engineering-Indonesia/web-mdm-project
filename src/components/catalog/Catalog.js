@@ -202,6 +202,18 @@ function Catalog() {
                 <Column lg={10} md={4} sm={2} className='column'>
                     <Tile className='table-tile'>
                             <p className='heading-text' style={{marginBottom: '2rem'}}>List of Tables</p>
+                            <Grid>
+                                <Column lg={5}></Column>
+                                <Column lg={5}>
+                                    <div className='search-div'>
+                                        <Search 
+                                        size="md" 
+                                        placeholder="Search" 
+                                        labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} onKeyDown={() => {}} 
+                                        />
+                                    </div>
+                                </Column>
+                            </Grid>
                             <Table>
                                 <TableHead>
                                     <TableRow>

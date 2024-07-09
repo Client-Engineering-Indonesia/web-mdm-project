@@ -1,4 +1,4 @@
-import './Users.css'
+import './Endpoint.css'
 import React from 'react';
 import {
     DataTable,
@@ -10,118 +10,129 @@ import {
     TableCell,
     Button, Search, Dropdown, IconButton, Pagination
 } from '@carbon/react';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Add, CopyFile, TrashCan, Edit, Power } from '@carbon/icons-react';
 
 
 const headers = [
     {
-        key: 'BusinessUnit',
-        header: 'Business Unit',
+        key: 'EndpointName',
+        header: 'Endpoint Name',
+    },
+   {
+        key: 'Status',
+        header: 'Status',
+   },
+   {
+        key: 'Engine',
+        header: 'Engine',
     },
     {
-        key: 'UserName',
-        header: 'User Name',
+        key: 'Hostname',
+        header: 'Hostname',
     },
     {
-        key: 'Email',
-        header: 'Email',
+        key: 'Port',
+        header: 'Port',
     },
     {
-        key: 'UserGroup',
-        header: 'User Group',
+        key: 'DatabaseName',
+        header: 'Database Name',
     },
     {
-        key: 'Role',
-        header: 'Role',
+        key: 'UserAcess',
+        header: 'User Access',
     },
     {
-        key: 'FullName',
-        header: 'Full Name',
+        key: 'CreatedAt',
+        header: 'Created At',
     },
     {
-        key: 'LastLogin',
-        header: 'Last Login',
-    },
-    {
-        key: 'CreatedDate',
-        header: 'Created Date',
-    },
-    {
-        key: 'ValidUntil',
-        header: 'Valid Until',
-    },
-    {
-        key: 'IsActive',
-        header: 'Is Active',
-    },
+        key: 'Subscribed',
+        header: 'Subscribed',
+    }
 ];
 
 const rows = [
     {
         id: 'a',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'Bambank@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
+        EndpointName: 'Endpoint 1',
+        Status: 'Active',
+        Engine: 'Postgres',
+        Hostname: 'localhost',
+        Port: '5432',
+        DatabaseName: 'db1',
+        UserAcess: 'user1',
+        CreatedAt: '2021-07-01',
+        Subscribed: 'TRUE'
     },
     {
         id: 'b',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'Syarifudin@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
+        EndpointName: 'Endpoint 2',
+        Status: 'Active',
+        Engine: 'Postgres',
+        Hostname: 'localhost',
+        Port: '5432',
+        DatabaseName: 'db2',
+        UserAcess: 'user2',
+        CreatedAt: '2021-07-02',
+        Subscribed: 'TRUE'
     },
     {
         id: 'c',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'moreno@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
+        EndpointName: 'Endpoint 3',
+        Status: 'Active',
+        Engine: 'Postgres',
+        Hostname: 'localhost',
+        Port: '5432',
+        DatabaseName: 'db3',
+        UserAcess: 'user3',
+        CreatedAt: '2021-07-03',
+        Subscribed: 'TRUE'
     },
     {
         id: 'd',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'farul@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
+        EndpointName: 'Endpoint 4',
+        Status: 'Active',
+        Engine: 'Postgres',
+        Hostname: 'localhost',
+        Port: '5432',
+        DatabaseName: 'db4',
+        UserAcess: 'user4',
+        CreatedAt: '2021-07-04',
+        Subscribed: 'TRUE'
+    },
+    {
+        id: 'e',
+        EndpointName: 'Endpoint 5',
+        Status: 'Active',
+        Engine: 'Postgres',
+        Hostname: 'localhost',
+        Port: '5432',
+        DatabaseName: 'db5',
+        UserAcess: 'user5',
+        CreatedAt: '2021-07-05',
+        Subscribed: 'TRUE'
     },
 ];
 
 
 
 
-function USERS() {
+function ENDPOINT() {
     return (
-        <section className='users'>
-            <div className='users-content'>
-                <div className='title'>
-                    <p>USERS</p>
-                </div>
+        <section className='endpoint'>
 
+            <div className='endpoint-tab'>
+                <Tabs>
+                    <TabList aria-label="List of tabs">
+                        <Tab>Internal</Tab>
+                        <Tab>External</Tab>
+                    </TabList>
+                </Tabs>
+            </div>
+
+            <div className='endpoint-content'>
                 <div className='options'>
                     <div className='menus'>
                         <div className='menu-name-images'>
@@ -155,12 +166,9 @@ function USERS() {
                             <p>Activate</p>
                         </div>
                     </div>
-                    <div className='search'>
-                        <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => { }} onKeyDown={() => { }} />
-                    </div>
                 </div>
 
-                <div className='users-tables'>
+                <div className='endpoint-tables'>
                     <DataTable rows={rows} headers={headers}>
                         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                             <Table {...getTableProps()}>
@@ -208,4 +216,4 @@ function USERS() {
     );
 }
 
-export default USERS;
+export default ENDPOINT;
