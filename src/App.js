@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; //npm i react-router-dom
 import Data_Exchange from './components/data-exchange/Data_Exchange'; 
 import Users from './components/Users/Users';
+import Endpoint from './components/Endpoint/Endpoint';
 import{
   Header,
   HeaderName,
@@ -60,7 +61,7 @@ function App() {
               </SideNavMenuItem>
             </SideNavMenu>
             <SideNavMenu title="Repositories">
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/endpoint">
                 Endpoint
               </SideNavMenuItem>
               <SideNavMenuItem href="https://www.carbondesignsystem.com/">
@@ -101,6 +102,11 @@ function App() {
           <Router>
               <Routes>
                 <Route path='/users' element={<Users />} />
+              </Routes>
+          </Router>
+          <Router>
+              <Routes>
+                <Route path='/endpoint' element={<Endpoint />} />
               </Routes>
           </Router>
         </section>
