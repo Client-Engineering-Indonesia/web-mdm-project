@@ -1,0 +1,98 @@
+.data-preview-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .selectors {
+    display: flex;
+    margin-bottom: 8px;
+  }
+  
+  .search-bar {
+    margin-bottom: 16px;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    padding: 8px;
+  }
+  
+  .content {
+    display: flex;
+  }
+  
+  .table-list {
+    width: 20%;
+    border-right: 1px solid #ccc;
+  }
+  
+  .table-item {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .table-item.selected {
+    background-color: #e0e0e0;
+  }
+  
+  .data-preview {
+    width: 80%;
+    padding-left: 16px;
+  }
+  
+  .data-preview table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .data-preview th, .data-preview td {
+    border: 1px solid #ccc;
+    padding: 8px;
+  }
+  
+  .pagination {
+    text-align: right;
+    padding: 8px 0;
+  }
+  
+  .dataset-form {
+    margin-top: 16px;
+  }
+  
+  .form-group {
+    margin-bottom: 8px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .filters {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .filter-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .filter-row select, .filter-row input {
+    margin-right: 8px;
+    flex: 1;
+  }
+  
+  .filter-row button {
+    flex-shrink: 0;
+  }
+  

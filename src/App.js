@@ -1,10 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; //npm i react-router-dom
-import Data_Exchange from './components/data-exchange/Data_Exchange'; 
+import Data_Exchange from './components/data-exchange/Data_Exchange';
 import Users from './components/Users/Users';
 import Catalog from './components/catalog/Catalog';
 import Endpoint from './components/Endpoint/Endpoint';
-import{
+import AuditLogs from './components/AuditLogs/AuditLogs'
+import Approval from './components/Approval/Approval'
+import Publish from './components/Publish/Publish'
+import {
   Header,
   HeaderName,
   HeaderNavigation,
@@ -21,26 +24,26 @@ import{
   Search,
   HeaderMenu,
   HeaderSideNavItems
-}from '@carbon/react'; //import dari node_modules
+} from '@carbon/react'; //import dari node_modules
 import './App.css';
 
 function App() {
-  
+
   return (
     <>
-    <Header className='header'>
+      <Header className='header'>
         <div className='title-container'>
           {/* option+shift+down */}
-          <p className='astra'>ASTRA DIGITAL</p>  
+          <p className='astra'>ASTRA DIGITAL</p>
           <p className='data-fabric'>DATA FABRIC</p>
         </div>
         <HeaderNavigation >
           <div className='profile'>
             <div>
-              <p className='role'>Business Unit - Admin</p>  
-              <p className='name'>user_name</p> 
+              <p className='role'>Business Unit - Admin</p>
+              <p className='name'>user_name</p>
             </div>
-             
+
             <Button size='sm' className='button'>Logout</Button>
           </div>
         </HeaderNavigation>
@@ -73,51 +76,64 @@ function App() {
               <SideNavMenuItem href="/data_exchange">
                 Data Exchange
               </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/approval">
                 Approval
               </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/publish">
                 Publish
               </SideNavMenuItem>
             </SideNavMenu>
             <SideNavMenu title="Monitoring">
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                Activity Logs
-              </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                Audit Trail
+              <SideNavMenuItem href="/auditlogs">
+                Audit and Logs
               </SideNavMenuItem>
             </SideNavMenu>
           </SideNavItems>
         </SideNav>
-        </Header>
+      </Header>
 
-        <section className='content'>
-          {/* routing below */}
-            <Router>
-                <Routes>
-                  <Route path="/data_exchange" element={<Data_Exchange />} />
-                </Routes>
-            </Router>
+      <section className='content'>
+        {/* routing below */}
+        <Router>
+          <Routes>
+            <Route path="/data_exchange" element={<Data_Exchange />} />
+          </Routes>
+        </Router>
 
-            <Router>
-                <Routes>
-                  <Route path='/users' element={<Users />} />
-                </Routes>
-            </Router>
+        <Router>
+          <Routes>
+            <Route path='/users' element={<Users />} />
+          </Routes>
+        </Router>
 
-            <Router>
-                <Routes>
-                  <Route path='/catalog' element={<Catalog />} />
-                </Routes>
-            </Router>
-            <Router>
-                <Routes>
-                  <Route path='/endpoint' element={<Endpoint />} />
-                </Routes>
-            </Router>
-        </section>
-  </>
+        <Router>
+          <Routes>
+            <Route path='/catalog' element={<Catalog />} />
+          </Routes>
+        </Router>
+        <Router>
+          <Routes>
+            <Route path='/endpoint' element={<Endpoint />} />
+          </Routes>
+        </Router>
+
+        <Router>
+          <Routes>
+            <Route path='/auditlogs' element={<AuditLogs />} />
+          </Routes>
+        </Router>
+        <Router>
+          <Routes>
+            <Route path='/approval' element={<Approval />} />
+          </Routes>
+        </Router>
+        <Router>
+          <Routes>
+            <Route path='/publish' element={<Publish />} />
+          </Routes>
+        </Router>
+      </section>
+    </>
   );
 }
 
