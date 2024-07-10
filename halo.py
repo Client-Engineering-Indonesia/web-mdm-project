@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import requests
 import json
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -22,7 +23,7 @@ def get_token():
 
         data = {
             'username': username,
-            'api_key': password
+            'password': password
         }
 
         headers = {
@@ -71,15 +72,18 @@ def grant_access():
             "table_schema": table_schema,
             "authid": authid
         }
+        print(payload)
 
         response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
-
+        
         if response.status_code == 200:
+            print(response.message)
             return jsonify({'message': 'ok'}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/revoke_access/<authid>', methods=['DELETE'])
@@ -176,6 +180,46 @@ def create_user():
 
         if response.status_code == 200:
             return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_roles', methods=['GET'])
+def get_roles_and_permissions():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/roles'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for role in responseJson["rows"]:
+                for i, permission in enumerate(role["doc"]["permissions"]):
+                    role["doc"]["permissions"][i] = permission.replace('_', ' ').title()
+                
+                resultObject = {
+                    "role_name": role["doc"]["role_name"],
+                    "role_description": role["doc"]["description"],
+                    "updated_at": datetime.fromtimestamp(role["doc"]["updated_at"]/1000).strftime('%Y-%m-%d'),
+                    "permissions": role["doc"]["permissions"]
+                }
+                resultList.append(resultObject)
+
+            return jsonify({"status": "Success", "data": resultList}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
