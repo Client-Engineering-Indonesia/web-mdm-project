@@ -5,8 +5,10 @@ import Users from './components/Users/Users';
 import Catalog from './components/catalog/Catalog';
 import Endpoint from './components/Endpoint/Endpoint';
 import AuditLogs from './components/AuditLogs/AuditLogs'
-import Approval from './components/Approval/Approval'
-import Publish from './components/Publish/Publish'
+import Approval from './components/Approval/Approval';
+import Publish from './components/Publish/Publish';
+import Roles from './components/roles/Roles';
+
 import {
   Header,
   HeaderName,
@@ -44,11 +46,11 @@ function App() {
               <p className='name'>user_name</p>
             </div>
 
-            <Button size='sm' className='button'>Logout</Button>
+            <Button size='lg' className='button' kind="secondary">Logout</Button>
           </div>
         </HeaderNavigation>
 
-        <SideNav aria-label="Side navigation" href="#main-content">
+        <SideNav className='side-nav' aria-label="Side navigation" href="#main-content">
           <SideNavItems>
             <SideNavMenu title="User Management">
               <SideNavMenuItem href="https://www.carbondesignsystem.com/">
@@ -60,7 +62,7 @@ function App() {
               <SideNavMenuItem href="/users">
                 Users
               </SideNavMenuItem>
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/roles">
                 Roles
               </SideNavMenuItem>
             </SideNavMenu>
@@ -92,13 +94,13 @@ function App() {
         </SideNav>
       </Header>
 
-      <section className='content'>
-        {/* routing below */}
-        <Router>
-          <Routes>
-            <Route path="/data_exchange" element={<Data_Exchange />} />
-          </Routes>
-        </Router>
+        <section className='content'>
+          {/* routing below */}
+          <Router>
+              <Routes>
+                <Route path="/data_exchange" element={<Data_Exchange />} />
+              </Routes>
+          </Router>
 
         <Router>
           <Routes>
@@ -130,6 +132,11 @@ function App() {
         <Router>
           <Routes>
             <Route path='/publish' element={<Publish />} />
+          </Routes>
+        </Router>
+        <Router>
+          <Routes>
+            <Route path='/roles' element={<Roles />} />
           </Routes>
         </Router>
       </section>

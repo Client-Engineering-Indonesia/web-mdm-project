@@ -28,6 +28,7 @@
     flex-direction: row;
     margin: 0px 0px 36px 0px;
     gap: 36px;
+    width:100%;
 }
 .data-exchange-content{
     width:100%;

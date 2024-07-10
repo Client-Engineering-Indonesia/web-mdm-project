@@ -50,6 +50,7 @@
   display: flex; 
   /* right justify */
   justify-content: flex-end;
+  align-items:center;
 
 }
 
@@ -70,18 +71,27 @@
 
 .button{
   margin: 2px 32px;
-  padding-top: 10px;
 }
 
 .header{
+  /* height: 60px; Adjust the height as needed */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the shadow as needed */
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: 0 20px; /* Add some padding if needed */
+  background-color: #fff; /* Ensure the background color is set */
+  z-index: 100; /* Ensure the header is on top of other elements */
+  height:60px;
 }
 
 .content{
-  margin: 68px 32px 40px 280px;
+  margin: 68px 48px 40px 280px;
 
+}
+
+.button {
+  margin-left: 10px;
 }
 
 @keyframes App-logo-spin {
@@ -91,6 +101,11 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.cds--side-nav__navigation {
+  margin-top:16px;
+  border-right:1px solid #e0e0e0;
 }
 
 
