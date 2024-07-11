@@ -5,11 +5,19 @@ import os
 import requests
 import json
 from datetime import datetime
+import uuid
 
 app = Flask(__name__)
 CORS(app)
 
 cp4d_url = os.getenv('cp4d_url')
+file_path = 'src/data/business-unit-data.json'
+
+def current_timestamp():
+    current_timestamp = datetime.now()
+    formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+    return formatted_timestamp
 
 @app.route('/')
 def hello_world():
@@ -72,12 +80,10 @@ def grant_access():
             "table_schema": table_schema,
             "authid": authid
         }
-        print(payload)
 
         response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
         
         if response.status_code == 200:
-            print(response.message)
             return jsonify({'message': 'ok'}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
@@ -341,5 +347,135 @@ def get_catalogs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_pending_requests', methods=['GET'])
+def get_pending_approval_requests():
+    try: 
+        file_path = 'src/data/business-unit-data.json'
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            result_list = []
+            for bu in data:
+                if bu["is_approved"] is False:
+                    result_list.append(bu)
+        
+        return jsonify({"status": "Success", "data": result_list}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_approved_requests', methods=['GET'])
+def get_approved_requests():
+    try: 
+        file_path = 'src/data/business-unit-data.json'
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+            result_list = []
+            for bu in data:
+                if bu["is_approved"] is True:
+                    result_list.append(bu)
+        
+        return jsonify({"status": "Success", "data": result_list}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/create_request', methods=['POST'])
+def create_request():
+    try: 
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        timestamp = current_timestamp()
+        unique_id = str(uuid.uuid4())[:8]
+
+        new_request = {
+            "id": unique_id,
+            "is_approved": False,
+            "requestor_business_unit": data.get('business_unit'),
+            "requestor_username":  data.get('username'),
+            "requestor_role": data.get('role'),
+            "table_name": data.get('table_name'),
+            "owner_email": data.get('owner_email'),
+            "owner_name": data.get('owner_name'),
+            "owner_phone": data.get('owner_phone'),
+            "description": data.get('description'),
+            "request_timestamp": timestamp,
+            "approved_timestamp": None,
+            "expire_date": data.get('duration')
+        }
+
+        file_path = 'src/data/business-unit-data.json'
+
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        data.append(new_request)
+
+        # Write the updated data back to the JSON file
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        
+        return jsonify({"status": "Success", "data": data}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/approve_request', methods=['POST'])
+def approve_request():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        request_id = data.get('id')
+        table_name = data.get('table_name')
+        authid = data.get('authid')
+        table_schema = data.get('table_schema')
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        payload = {
+            "table_name": table_name,
+            "table_schema": table_schema,
+            "authid": authid
+        }
+        access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+        if access_response.status_code == 200:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+            found = False
+            for item in data:
+                if item["id"] == request_id:
+                    item["is_approved"] = True
+                    item["approved_timestamp"] = current_timestamp()
+                    found = True
+
+            # Write the updated data back to the JSON file
+            with open(file_path, 'w') as file:
+                json.dump(data, file, indent=4)
+
+            if found:
+                return jsonify({"status": "Success", "data": data}), 200
+            else:
+                return jsonify({"status": "Failed", "message": "Request not found"}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)

@@ -1,0 +1,47 @@
+[
+    {
+        "id": "3d7ae9cb",
+        "is_approved": false,
+        "requestor_business_unit": null,
+        "requestor_username": null,
+        "requestor_role": null,
+        "table_name": "Table 1",
+        "owner_email": "test",
+        "owner_name": "test",
+        "owner_phone": "test",
+        "description": "test",
+        "request_timestamp": "2024-07-11 18:05:56",
+        "approved_timestamp": null,
+        "expire_date": "2024-07-31 00.00.00"
+    },
+    {
+        "id": "3d7ae9cc",
+        "is_approved": false,
+        "requestor_business_unit": null,
+        "requestor_username": null,
+        "requestor_role": null,
+        "table_name": "Table 1",
+        "owner_email": "test",
+        "owner_name": "test",
+        "owner_phone": "test",
+        "description": "test",
+        "request_timestamp": "2024-07-11 18:05:56",
+        "approved_timestamp": null,
+        "expire_date": "2024-07-31 00.00.00"
+    },
+    {
+        "id": "f6b66af7",
+        "is_approved": true,
+        "requestor_business_unit": null,
+        "requestor_username": null,
+        "requestor_role": null,
+        "table_name": null,
+        "owner_email": "test",
+        "owner_name": "test",
+        "owner_phone": "test",
+        "description": "test",
+        "request_timestamp": "2024-07-11 21:21:02",
+        "approved_timestamp": "2024-07-11 21:22:00",
+        "expire_date": "2024-07-31 00.00.00"
+    }
+]
