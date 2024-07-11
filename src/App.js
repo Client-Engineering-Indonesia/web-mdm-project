@@ -81,9 +81,9 @@ function App() {
               <SideNavMenuItem href="/approval">
                 Approval
               </SideNavMenuItem>
-              <SideNavMenuItem href="/publish">
+              {/* <SideNavMenuItem href="/publish">
                 Publish
-              </SideNavMenuItem>
+              </SideNavMenuItem> */}
             </SideNavMenu>
             <SideNavMenu title="Monitoring">
               <SideNavMenuItem href="/auditlogs">

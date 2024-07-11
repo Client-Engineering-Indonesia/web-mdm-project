@@ -8,9 +8,6 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    TableToolbar,
-    TableToolbarContent,
-    Button,
     Modal,
     FormGroup,
     TextInput,
@@ -94,6 +91,18 @@ const rowsPending = [
     },
     {
         id: '5',
+        businessUnit: 'Business Unit 1',
+        datasetName: 'TRANSACTIONSET',
+        databaseName: 'DB_MSSQL_1',
+        tableName: 'TRANSACTION_TABLE_1',
+        requestor: 'SPV_BU_1',
+        requestTimestamp: '2024-01-01 00:00:00',
+        role: 'Viewer',
+        duration: '15',
+        type: 'Publish',
+    },
+    {
+        id: '6',
         businessUnit: 'Business Unit 1',
         datasetName: 'TRANSACTIONSET',
         databaseName: 'DB_MSSQL_1',
@@ -221,47 +230,23 @@ const Approval = () => {
         setPageActive(1); // Reset page to 1 when searching
     };
 
-    const handlePageChangePending = (pageNumber) => {
-        setPagePending(pageNumber);
+    const handlePageChangePending = (event) => {
+        setPagePending(event.page);
     };
 
-    const handlePageChangeActive = (pageNumber) => {
-        setPageActive(pageNumber);
+    const handlePageChangeActive = (event) => {
+        setPageActive(event.page);
     };
 
+    const paginatedPendingRows = filteredPendingRows.slice(
+        (pagePending - 1) * itemsPerPage,
+        pagePending * itemsPerPage
+    );
 
-    // const handleActionClick = (row, action) => {
-    //     if (action === 'approve' || action === 'reject') {
-    //         const confirmMessage = action === 'approve' ? 'Approve this request?' : 'Reject this request?';
-    //         if (window.confirm(confirmMessage)) {
-    //             // Handle approve/reject logic
-    //             console.log(`${action} request`, row);
-    //         }
-    //     } else if (action === 'show') {
-    //         setSelectedRow(row);
-    //         setOpen(true);
-    //     }
-    // };
-
-    // const handleSearch = (event) => {
-    //     setSearchInput(event.target.value.toLowerCase());
-
-    //     // Filter pending rows
-    //     const filteredPending = rowsPending.filter(row =>
-    //         Object.values(row).some(value =>
-    //             String(value).toLowerCase().includes(searchInput)
-    //         )
-    //     );
-    //     setFilteredPendingRows(filteredPending);
-
-    //     // Filter active rows
-    //     const filteredActive = rowsActive.filter(row =>
-    //         Object.values(row).some(value =>
-    //             String(value).toLowerCase().includes(searchInput)
-    //         )
-    //     );
-    //     setFilteredActiveRows(filteredActive);
-    // };
+    const paginatedActiveRows = filteredActiveRows.slice(
+        (pageActive - 1) * itemsPerPage,
+        pageActive * itemsPerPage
+    );
 
     const renderFormFields = () => {
         console.log('selected Row', selectedRow);
@@ -287,7 +272,7 @@ const Approval = () => {
     return (
         <div>
             <div >
-                <div className="approval-container">
+                <div className="pending-container">
                     <div className='options'>
                         <div className='title'>
                             PENDING APPROVAL
@@ -307,8 +292,7 @@ const Approval = () => {
                         </div>
                     </div>
 
-
-                    <DataTable rows={filteredPendingRows.slice((pagePending - 1) * itemsPerPage, pagePending * itemsPerPage)} headers={headersPending} style={{ width: '900px' }}>
+                    <DataTable rows={paginatedPendingRows} headers={headersPending}>
                         {({ rows, headers, getHeaderProps, getRowProps }) => (
                             <TableContainer className="table-container">
                                 <Table>
@@ -326,12 +310,6 @@ const Approval = () => {
                                                 {row.cells.map(cell => (
                                                     <TableCell key={cell.id}>{cell.value}</TableCell>
                                                 ))}
-
-                                                {/* <TableCell>
-                                                    <Button size="small" onClick={() => handleActionClick(row, 'approve')}>Approve</Button>
-                                                    <Button size="small" onClick={() => handleActionClick(row, 'reject')}>Reject</Button>
-                                                    <Button size="small" onClick={() => handleActionClick(row, 'show')}>Show</Button>
-                                                </TableCell> */}
 
                                                 <TableCell>
                                                     <CheckmarkOutline
@@ -355,7 +333,7 @@ const Approval = () => {
                                 <Pagination
                                     totalItems={filteredPendingRows.length}
                                     pageSize={itemsPerPage}
-                                    pageSizes={[itemsPerPage]}
+                                    pageSizes={[5, 10, 15, 20, 25]}
                                     page={pagePending}
                                     onChange={handlePageChangePending}
                                 />
@@ -384,7 +362,7 @@ const Approval = () => {
                         </div>
                     </div>
 
-                    <DataTable rows={filteredActiveRows.slice((pageActive - 1) * itemsPerPage, pageActive * itemsPerPage)} headers={headersActive} style={{ width: '900px' }}>
+                    <DataTable rows={paginatedActiveRows} headers={headersActive}>
                         {({ rows, headers, getHeaderProps, getRowProps }) => (
                             <TableContainer className="table-container">
                                 <Table>
@@ -416,7 +394,7 @@ const Approval = () => {
                                 <Pagination
                                     totalItems={filteredActiveRows.length}
                                     pageSize={itemsPerPage}
-                                    pageSizes={[itemsPerPage]}
+                                    pageSizes={[5, 10, 15, 20]}
                                     page={pageActive}
                                     onChange={handlePageChangeActive}
                                 />
