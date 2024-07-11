@@ -8,7 +8,7 @@ from datetime import datetime
 import uuid
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*")
 
 cp4d_url = os.getenv('cp4d_url')
 file_path = 'src/data/business-unit-data.json'
