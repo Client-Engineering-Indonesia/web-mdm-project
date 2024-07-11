@@ -226,5 +226,120 @@ def get_roles_and_permissions():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_groups', methods=['GET'])
+def get_user_groups():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for group in responseJson["results"]:
+                resultObject = {
+                    "group_name": group["name"],
+                    "group_description": group["description"],
+                    "role": group["roles"],
+                    "active_member": group["members_count"]
+                }
+
+                resultList.append(resultObject)
+
+            return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Get Business Unit Groups
+@app.route('/get_business_units', methods=['GET'])
+def get_business_units_groups():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for group in responseJson["results"]:
+                if (group["name"].lower().startswith("business")):
+                    resultObject = {
+                        "group_name": group["name"],
+                        "group_description": group["description"],
+                        "role": group["roles"],
+                        "active_member": group["members_count"]
+                    }
+
+                    resultList.append(resultObject)
+
+            return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_catalogs', methods=['GET'])
+def get_catalogs():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/v2/catalogs'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for catalog in responseJson["catalogs"]:
+                resultObject = {
+                    "catalog_id": catalog["metadata"]["guid"],
+                    "catalog_name": catalog["entity"]["name"].replace('_', ' '),
+                    "catalog_description": catalog["entity"]["description"],
+                }
+
+                resultList.append(resultObject)
+
+            return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)
