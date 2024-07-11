@@ -1,5 +1,36 @@
-.roles{
-    width:100%;
+
+
+.title-and-action{
     display: flex;
     flex-direction: row;
+    width:100%;
+    justify-content: space-between;
+    /* make it centered */
+    align-items: center;
+}
+
+.title{
+    margin:0;
+}
+
+.action{
+    display: flex;
+    flex-direction: row;
+}
+
+.action-role{
+    display: flex;
+    gap: 8px;
+    margin: 0px 0px 0px 16px;
+    align-items: center;
+}
+
+.crud-roles{
+    display:flex;
+    flex-direction: column;
+    gap:12px;
+}
+
+.roles{
+    padding-top:16px;
 }
