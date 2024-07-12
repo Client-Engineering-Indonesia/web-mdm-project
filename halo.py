@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 import os
 import requests
 import json
-from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -340,6 +340,69 @@ def get_catalogs():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+
+current_directory = os.path.dirname(os.path.abspath(__file__))
+file_name = 'ApprovalData.json'
+file_path = os.path.join(current_directory, file_name)
+
+def load_data():
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        data = []
+    return data
+
+def save_data(data):
+    with open(file_path, 'w') as file:
+        json.dump(data, file, indent=4)
+
+
+@app.route('/get_approval_data', methods=['GET'])
+def get_approval_data():
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        return jsonify(data), 200
+    except FileNotFoundError:
+        return jsonify({'error': 'Data file not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/update_approval_status/<id>', methods=['PUT'])
+def update_approval_status(id):
+    try:
+        new_status = request.json.get('status')
+        current_time = datetime.now()
+
+        data = load_data()
+        updated = False
+        for entry in data:
+            if entry['id'] == id:
+                entry['status'] = new_status
+                entry['approvedTimestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                
+                if new_status == 'Rejected':
+                    expire_date = current_time.strftime("%Y-%m-%d") 
+                else:
+                    duration_minutes = int(entry['duration'])
+                    expire_date = (current_time + timedelta(minutes=duration_minutes)).strftime("%Y-%m-%d %H:%M:%S")
+                entry['expireDate'] = expire_date
+                updated = True
+                break
+
+        if updated:
+            save_data(data)
+            return jsonify({'message': f'Status updated for ID {id}'}), 200
+        else:
+            return jsonify({'error': f'ID {id} not found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)
