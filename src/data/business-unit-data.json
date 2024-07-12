@@ -73,5 +73,20 @@
         "request_timestamp": "2024-07-12 16:07:47",
         "approved_timestamp": null,
         "expire_date": "2"
+    },
+    {
+        "id": "47d308f5",
+        "is_approved": false,
+        "requestor_business_unit": null,
+        "requestor_username": null,
+        "requestor_role": null,
+        "table_name": null,
+        "owner_email": "testowneremail@email.com",
+        "owner_name": "Test Owner",
+        "owner_phone": "0123456789",
+        "description": "New Description Added.",
+        "request_timestamp": "2024-07-12 16:18:02",
+        "approved_timestamp": null,
+        "expire_date": "3"
     }
 ]
