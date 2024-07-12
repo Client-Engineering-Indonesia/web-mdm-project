@@ -1,0 +1,34 @@
+.action-button{
+    align-items: center;
+    display: flex;
+    gap: 6px;
+}
+
+.business-action{
+    display: flex;
+    gap: 24px;
+
+}
+
+.business-unit{
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    gap: 36px;
+}
+
+.action-and-search{
+    display: flex;
+    width: 100%;
+    gap: 36px;
+}
+
+.business-search{
+    width: 100%;
+}
+
+.title-action-search{
+    display: flex;
+    flex-direction: column;
+    gap:16px;
+}
