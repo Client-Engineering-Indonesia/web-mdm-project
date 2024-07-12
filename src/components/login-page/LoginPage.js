@@ -1,9 +1,50 @@
 import './LoginPage.css'
-import { React, useState} from 'react';
-import {  Button, Search, Dropdown, IconButton, Pagination, Modal, Select, SelectItem, TextInput
-} from '@carbon/react';
+import { React, useState, useEffect } from 'react';
+import {  Button, Form, TextInput, Stack } from '@carbon/react';
+import Cookies from 'js-cookie';
 
 export default function LOGIN () {
+    const [formData, setFormData] = useState({
+        username: '',
+        password: ''
+      });
+    const [errors, setErrors] = useState({});
+    
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormData({ ...formData, [name]: value });
+        setErrors({ ...errors, [name]: '' });
+    };
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        const loginData = {
+            username: formData.username,
+            password: formData.password
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/login', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const responseData = await response.json();
+            Cookies.set('web_token', responseData.jwt_token, { expires: 7 });
+            console.log('Response from server:', responseData);
+            window.location.replace('http://localhost:3000/business_unit');
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
+    };
+
     return (
         <div className='login-container'>
             <div className='login-box'>
@@ -11,26 +52,41 @@ export default function LOGIN () {
                     <p>Log In</p>
                 </div>
                 <div className='login-form'>
-                    <div className='login-input'>
-                        <TextInput
-                            id='username'
-                            labelText='Username'
-                            placeholder='Enter your username'
-                            required
-                        />
-                    </div>
-                    <div className='login-input'>
-                        <TextInput
-                            id='password'
-                            labelText='Password'
-                            placeholder='Enter your password'
-                            type='password'
-                            required
-                        />
-                    </div>
-                    <div className='login-button'>
-                        <Button size='lg' className='button' kind="primary">Login</Button>
-                    </div>
+                    <Form onSubmit={handleLogin}>
+                        <Stack gap={5}>
+                            <div className='login-input'>
+                                <TextInput
+                                    id='username'
+                                    labelText='Username'
+                                    placeholder='Enter your username'
+                                    name="username"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    invalid={!!errors.username}
+                                    invalidText={errors.username}
+                                    required
+                                />
+                            </div>
+                            <div className='login-input'>
+                                <TextInput
+                                    id='password'
+                                    labelText='Password'
+                                    placeholder='Enter your password'
+                                    type='password'
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    invalid={!!errors.password}
+                                    invalidText={errors.password}
+                                    required
+                                />
+                            </div>
+                        </Stack>
+                        
+                        <div className='login-button'>
+                            <Button size='lg' type="submit" className='button' kind="primary">Login</Button>
+                        </div>
+                    </Form>
                 </div>
             </div>
         </div>

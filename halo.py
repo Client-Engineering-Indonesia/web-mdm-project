@@ -6,11 +6,12 @@ import os
 import requests
 import json
 import uuid
+import jwt
 
 
 app = Flask(__name__)
 CORS(app)
-
+secret = os.getenv('secret') if os.getenv('secret') else secret_key
 cp4d_url = os.getenv('cp4d_url')
 
 def current_timestamp():
@@ -396,6 +397,7 @@ def login():
         user_id = user_info.get('uid')
         username = user_info.get('user_name')
         user_email = user_info.get('email')
+        role = user_info.get('role')
         groups = user_info.get('groups', [])
 
         # Find the first business unit name in groups
@@ -417,18 +419,40 @@ def login():
             'uid': user_id,
             'username': username,
             'user_email': user_email,
+            'role': role,
             'business_unit_name': business_unit_name,
             'business_unit_id': business_unit_id,
             'cp4d_token': cp4d_token,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expiration time
+            'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
         }
 
-        secret = os.getenv('secret') if os.getenv('secret') else secret_key
         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
 
         return jsonify({'jwt_token': jwt_token}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/user_info', methods=['POST'])
+def get_user_info_from_jwt():
+    data = request.get_json()
+    token = data.get('token')
+    if not token:
+        return jsonify({'error': 'Token is missing'}), 400
+    
+    decoded_token = decodeJwtToken(token)
+    if 'error' in decoded_token:
+        return jsonify(decoded_token), status_code
+
+    return jsonify({'user_info': decoded_token}), 200
+
+def decodeJwtToken(token):
+    try:
+        decoded_token = jwt.decode(token, secret, algorithms=['HS256'])
+        return decoded_token
+    except jwt.ExpiredSignatureError:
+        return jwt.Expire
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid token'}), 401
 
 @app.route('/get_groups', methods=['GET'])
 def get_groups():
@@ -545,7 +569,6 @@ def get_catalogs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 file_name = 'ApprovalData.json'
