@@ -4,12 +4,15 @@ import { Button, Search, Dropdown } from '@carbon/react';
 import axios from 'axios'; // Import Axios
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-
+import DataExchangeRequestForm from './DataExchangeRequestForm';
 const url1 = 'http://52.118.170.239:8443';
 const url2 = 'http://127.0.0.1:5000'
 
 function Data_Exchange() {
-
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
     const items = [
         {
             id: 'option-0',
@@ -22,7 +25,6 @@ function Data_Exchange() {
             tagId: '16'
         },
     ];
-    
     const arrayObject=[
         {
             table_name:'BU_A_CUSTOMER',
@@ -45,25 +47,19 @@ function Data_Exchange() {
             description:'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
     ];
-
-    
     // const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
     // Load button state from cookies
     const loadButtonState = () => {
         const savedState = Cookies.get('buttonState');
         return savedState ? JSON.parse(savedState) : Array(arrayObject.length).fill(false);
     };
-
     const [changeButton, setChangeButton] = useState(loadButtonState);
-
     useEffect(() => {
         // Save button state to cookies whenever it changes
         Cookies.set('buttonState', JSON.stringify(changeButton), { expires:100000});
     }, [changeButton]);
-    
     console.log(changeButton);
     console.log(arrayObject.length);
-    
     const onClick = async (index) => {
         const getToken = async () => {
             try {
@@ -79,7 +75,6 @@ function Data_Exchange() {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
         };
-
         try {
             if (changeButton[index] === false) {
                 const response = await axios.post(`${url1}/grant_access`, {
@@ -95,17 +90,14 @@ function Data_Exchange() {
                 });
                 console.log('Revoke successful:', response);
             }
-
             const newChangeButton = [...changeButton];
             newChangeButton[index] = !newChangeButton[index];
             setChangeButton(newChangeButton);
         } catch (error) {
             console.error('Error making request:', error.response ? error.response.data : error.message);
         }
-
     };
-
-
+    
   return (
     <section className='data-exchange'>
         {/* categories and vendors */}
@@ -124,7 +116,6 @@ function Data_Exchange() {
             </div>
         </section>
         {/* categories and vendors */}
-
         {/* content */}
         <section className='data-exchange-content'>
             {/* product catalog */}
@@ -145,7 +136,6 @@ function Data_Exchange() {
                 </div>
             </div>
             {/* product catalog */}
-
             {/* request list */}
             <div className='request-list'>
                 {arrayObject.map((item, index) => (
@@ -153,19 +143,16 @@ function Data_Exchange() {
                         <p>{item.table_name}</p>
                         <p>{item.business_name}</p>
                         <p>{item.description}</p>
-                        {changeButton[index]===false && <Button size='md'onClick={() => onClick(index)} className='request-access'>Request Access</Button>} 
-                        {changeButton[index]===true && <Button size='md'onClick={() => onClick(index)} className='request-access'>Revoke</Button>} 
+                        {changeButton[index]===false && <Button size='md' onClick={toggleSidebar} className='request-access'>Request Access</Button>}
+                        {changeButton[index]===true && <Button size='md' onClick={() => onClick(index)} className='request-access'>Revoke</Button>}
                     </div>
                 ))}
             </div>
             {/* request list */}
-
         </section>
         {/* content */}
-
-
+        <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} />
     </section>
     );
 }
-
 export default Data_Exchange;
