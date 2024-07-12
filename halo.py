@@ -186,6 +186,114 @@ def create_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_users', methods=['GET'])
+def get_users():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/usermgmt/users'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/edit_user/<username>', methods=['PUT'])
+def edit_user(username):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/usermgmt/users/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.put(url, headers=headers, data=json.dumps(data), verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_user_groups', methods=['GET'])
+def get_user_groups():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_group_members/<group_id>', methods=['GET'])
+def get_group_members(group_id):
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups/{group_id}/members'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/get_roles', methods=['GET'])
 def get_roles_and_permissions():
     try:
@@ -220,6 +328,41 @@ def get_roles_and_permissions():
                 resultList.append(resultObject)
 
             return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# login
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        headers = {
+            'content-type': 'application/json'
+        }
+
+        payload = {
+            "username": username,
+            "password": password
+        }
+
+        response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
+
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
