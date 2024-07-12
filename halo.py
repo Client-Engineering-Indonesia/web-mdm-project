@@ -609,15 +609,8 @@ def update_approval_status(id):
         updated = False
         for entry in data:
             if entry['id'] == id:
-                entry['status'] = new_status
-                entry['approvedTimestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
-                
-                if new_status == 'Rejected':
-                    expire_date = current_time.strftime("%Y-%m-%d") 
-                else:
-                    duration_minutes = int(entry['duration'])
-                    expire_date = (current_time + timedelta(minutes=duration_minutes)).strftime("%Y-%m-%d %H:%M:%S")
-                entry['expireDate'] = expire_date
+                entry['is_approved'] = new_status
+                entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
                 updated = True
                 break
 
