@@ -5,7 +5,7 @@ import axios from 'axios'; // Import Axios
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-const url1 = 'http://52.118.170.239:8443';
+const url1 = 'http://';
 const url2 = 'http://127.0.0.1:5000'
 
 function Data_Exchange() {
@@ -67,7 +67,7 @@ function Data_Exchange() {
     const onClick = async (index) => {
         const getToken = async () => {
             try {
-                const response = await axios.post(`${url1}/get_token`);
+                const response = await axios.post(`${url2}/get_token`);
                 return response.data.token; // Adjust this according to your API response structure
             } catch (error) {
                 console.error('Error fetching token:', error);
@@ -82,14 +82,14 @@ function Data_Exchange() {
 
         try {
             if (changeButton[index] === false) {
-                const response = await axios.post(`${url1}/grant_access`, {
+                const response = await axios.post(`${url2}/grant_access`, {
                     table_name: arrayObject[index].table_name,
                 }, { headers });
                 console.log('Request successful:', response);
             } else {
                 const table_name = arrayObject[index].table_name;
                 const table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM';
-                const response = await axios.delete(`${url1}/revoke_access/adi.wijaya@ibm.com`, {
+                const response = await axios.delete(`${url2}/revoke_access/adi.wijaya@ibm.com`, {
                     headers: headers,
                     params: { table_name, table_schema }
                 });

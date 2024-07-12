@@ -1,6 +1,6 @@
 import './Roles.css';
 import React, { useState, useEffect } from 'react';
-import { IconButton, Search, Row, Dropdown, Grid, Tile, Column, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
+import { IconButton, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
 import axios from 'axios';
 import { Add, TrashCan, Power } from '@carbon/icons-react';
 
@@ -11,6 +11,8 @@ function Roles() {
     const [data, setData] = useState([]); // Initialize state as an empty array
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState(null); // Error state
+    const [blockedRowIndex, setBlockedRowIndex] = useState(null);
+    const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const getToken = async () => {
         try {
@@ -30,6 +32,7 @@ function Roles() {
                 'Authorization': `Bearer ${token}`
             };
             const response = await axios.get(`${url2}/get_roles`, { headers: requestHeaders });
+            console.log(response);
             setData(response.data.data); // Ensure this matches the structure of your API response
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -47,8 +50,16 @@ function Roles() {
         { key: 'role_name', header: 'Role Name' },
         { key: 'role_description', header: 'Role Description' },
         { key: 'updated_at', header: 'Updated Date' },
-        { key: 'permissions', header: 'Permissions' }
     ];
+
+    const permissionColumn = { key: 'permissions', header: 'Permissions' };
+
+    const setPermission = (index) => {
+        return () => {
+            setBlockedRowIndex(index);
+            setSelectedPermissions(data[index].permissions);
+        }
+    }
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error loading data</div>;
@@ -96,12 +107,16 @@ function Roles() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Array.isArray(data) && data.map((row) => (
-                                <TableRow key={row.role_name}>
+                            {Array.isArray(data) && data.map((row, i) => (
+                                <TableRow
+                                    key={row.role_name}
+                                    onClick={setPermission(i)}
+                                    className={blockedRowIndex === i ? 'blocked' : ''}
+                                >
                                     <TableCell>{row.role_name}</TableCell>
                                     <TableCell>{row.role_description}</TableCell>
                                     <TableCell>{row.updated_at}</TableCell>
-                                    <TableCell>{row.permissions.join(', ')}</TableCell>
+                                    {/* <TableCell>{row.permissions.join(', ')}</TableCell> */}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -110,6 +125,30 @@ function Roles() {
                 {/* content table */}
             </section>
             {/* crud roles */}
+
+            {/* permission list */}
+            <section className='permission-list'>
+                <p className='title'>Permission</p>
+                <div>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableHeader key={permissionColumn.key} style={{ width: 400 }}>
+                                    {permissionColumn.header}
+                                </TableHeader>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {selectedPermissions.map((permission, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{permission}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            </section>
+            {/* permission list */}
         </section>
     );
 }

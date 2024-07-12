@@ -46,6 +46,7 @@ def get_token():
 def grant_access():
     try:
         data = request.get_json()
+    
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400

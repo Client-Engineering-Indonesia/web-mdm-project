@@ -11,6 +11,8 @@
 
 .title{
     margin:0;
+    height:48px;
+    align-items: center;
 }
 
 .action{
@@ -33,4 +35,18 @@
 
 .roles{
     padding-top:16px;
+    display: flex;
+    gap:42px;
+}
+
+.blocked {
+    background-color: lightgrey; /* Light gray background */
+    pointer-events: none;      /* Disable click events */
+    opacity: 0.6;              /* Reduce opacity */
+}
+
+.permission-list{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
