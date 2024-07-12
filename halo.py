@@ -5,13 +5,19 @@ from datetime import datetime, timedelta
 import os
 import requests
 import json
-import datetime
-import jwt
+import uuid
+
 
 app = Flask(__name__)
 CORS(app)
 
 cp4d_url = os.getenv('cp4d_url')
+
+def current_timestamp():
+    current_timestamp = datetime.now()
+    formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_timestamp
+
 
 @app.route('/')
 def hello_world():
@@ -601,6 +607,48 @@ def update_approval_status(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@app.route('/create_request', methods=['POST'])
+def create_request():
+    try: 
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        timestamp = current_timestamp()
+        unique_id = str(uuid.uuid4())[:8]
+
+        new_request = {
+            "id": unique_id,
+            "is_approved": False,
+            "requestor_business_unit": data.get('business_unit'),
+            "requestor_username":  data.get('username'),
+            "requestor_role": data.get('role'),
+            "table_name": data.get('table_name'),
+            "owner_email": data.get('owner_email'),
+            "owner_name": data.get('owner_name'),
+            "owner_phone": data.get('owner_phone'),
+            "description": data.get('description'),
+            "request_timestamp": timestamp,
+            "approved_timestamp": None,
+            "expire_date": data.get('duration')
+        }
+
+        json_path = 'src/data/business-unit-data.json'
+
+        with open(json_path, 'r') as file:
+            data = json.load(file)
+
+        data.append(new_request)
+
+        # Write the updated data back to the JSON file
+        with open(json_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        
+        return jsonify({"status": "Success", "data": data}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)
