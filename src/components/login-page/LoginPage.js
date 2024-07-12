@@ -17,7 +17,6 @@ export default function LOGIN () {
     };
 
     const handleLogin = async (event) => {
-        console.log("handle login")
         event.preventDefault();
         const loginData = {
             username: formData.username,
@@ -25,24 +24,24 @@ export default function LOGIN () {
         };
 
         try {
-        const response = await fetch('http://127.0.0.1:5000/login', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loginData),
-        });
-        console.log(response)
+            const response = await fetch('http://127.0.0.1:5000/login', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+            });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-        const responseData = await response.json();
-        Cookies.set('web_token', responseData.jwt_token, { expires: 7 });
-        console.log('Response from server:', responseData);
+            const responseData = await response.json();
+            Cookies.set('web_token', responseData.jwt_token, { expires: 7 });
+            console.log('Response from server:', responseData);
+            window.location.replace('http://localhost:3000/business_unit');
         } catch (error) {
-        console.error('Error submitting form:', error);
+            console.error('Error submitting form:', error);
         }
     };
 
