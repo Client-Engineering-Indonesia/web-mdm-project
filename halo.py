@@ -5,6 +5,12 @@ from datetime import datetime, timedelta
 import os
 import requests
 import json
+import uuid
+
+def current_timestamp():
+    current_timestamp = datetime.now()
+    formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_timestamp
 
 app = Flask(__name__)
 CORS(app)
