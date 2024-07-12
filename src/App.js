@@ -8,6 +8,7 @@ import AuditLogs from './components/AuditLogs/AuditLogs'
 import Approval from './components/Approval/Approval';
 import Publish from './components/Publish/Publish';
 import Roles from './components/roles/Roles';
+import Business_Unit from './components/business-unit/Business_Unit';
 
 import {
   Header,
@@ -54,7 +55,7 @@ function App() {
         <SideNav className='side-nav' aria-label="Side navigation" href="#main-content">
           <SideNavItems>
             <SideNavMenu title="User Management">
-              <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+              <SideNavMenuItem href="/business_unit">
                 Business Unit
               </SideNavMenuItem>
               <SideNavMenuItem href="https://www.carbondesignsystem.com/">
@@ -106,6 +107,12 @@ function App() {
         <Router>
           <Routes>
             <Route path='/users' element={<Users />} />
+          </Routes>
+        </Router>
+
+        <Router>
+          <Routes>
+            <Route path='/business_unit' element={<Business_Unit />} />
           </Routes>
         </Router>
 
