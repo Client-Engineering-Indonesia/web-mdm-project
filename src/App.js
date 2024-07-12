@@ -28,6 +28,7 @@ import {
   HeaderSideNavItems
 } from '@carbon/react'; //import dari node_modules
 import './App.css';
+import Login from './components/login-page/LoginPage';
 
 function App() {
 
@@ -94,17 +95,23 @@ function App() {
         </SideNav>
       </Header>
 
-        <section className='content'>
-          {/* routing below */}
-          <Router>
-              <Routes>
-                <Route path="/data_exchange" element={<Data_Exchange />} />
-              </Routes>
-          </Router>
+      <section className='content'>
+        {/* routing below */}
+        <Router>
+          <Routes>
+            <Route path="/data_exchange" element={<Data_Exchange />} />
+          </Routes>
+        </Router>
 
         <Router>
           <Routes>
             <Route path='/users' element={<Users />} />
+          </Routes>
+        </Router>
+
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
           </Routes>
         </Router>
 
