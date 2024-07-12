@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import os
 import requests
 import json
+import datetime
+import jwt
 
 app = Flask(__name__)
 CORS(app)
@@ -77,7 +79,7 @@ def grant_access():
         response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
         
         if response.status_code == 200:
-            print(response.message)
+            # print(response.message)
             return jsonify({'message': 'ok'}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
@@ -186,6 +188,114 @@ def create_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/get_users', methods=['GET'])
+def get_users():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/usermgmt/users'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/edit_user/<username>', methods=['PUT'])
+def edit_user(username):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/usermgmt/users/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.put(url, headers=headers, data=json.dumps(data), verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_user_groups', methods=['GET'])
+def get_user_groups():
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_group_members/<group_id>', methods=['GET'])
+def get_group_members(group_id):
+    try:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v2/groups/{group_id}/members'
+
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        response = requests.get(url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/get_roles', methods=['GET'])
 def get_roles_and_permissions():
     try:
@@ -226,8 +336,95 @@ def get_roles_and_permissions():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# login
+
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        headers = {
+            'content-type': 'application/json'
+        }
+
+        payload = {
+            "username": username,
+            "password": password
+        }
+
+        # Get CP4D token
+        auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=payload)
+
+        if auth_response.status_code != 200:
+            return jsonify({'error': 'Authentication failed', 'details': auth_response.text}), auth_response.status_code
+
+        cp4d_token = auth_response.json().get('token')
+
+        if not cp4d_token:
+            return jsonify({'error': 'Failed to retrieve CP4D token'}), 400
+
+        # Use CP4D token to get user info
+        user_info_headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {cp4d_token}'
+        }
+
+        user_info_response = requests.get(f'{cp4d_url}/usermgmt/v1/user/currentUserInfo', headers=user_info_headers)
+
+        if user_info_response.status_code != 200:
+            return jsonify({'error': 'Failed to retrieve user info', 'details': user_info_response.text}), user_info_response.status_code
+
+        user_info = user_info_response.json()
+
+        # Assuming user_info contains username, email, and business unit group
+        user_id = user_info.get('uid')
+        username = user_info.get('user_name')
+        user_email = user_info.get('email')
+        groups = user_info.get('groups', [])
+
+        # Find the first business unit name in groups
+        business_unit_name = None
+        business_unit_id = None
+
+        for group in groups:
+            name = group.get('name')
+            if name and 'business' in name.lower():  # Check if 'business' is in the name
+                business_unit_name = name
+                business_unit_id = group.get('group_id')
+                break  # Stop after finding the first match
+
+        if not username:
+            return jsonify({'error': 'User info is incomplete'}), 400
+
+        # Create JWT token
+        jwt_payload = {
+            'uid': user_id,
+            'username': username,
+            'user_email': user_email,
+            'business_unit_name': business_unit_name,
+            'business_unit_id': business_unit_id,
+            'cp4d_token': cp4d_token,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expiration time
+        }
+
+        secret = os.getenv('secret') if os.getenv('secret') else secret_key
+        jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
+
+        return jsonify({'jwt_token': jwt_token}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/get_groups', methods=['GET'])
-def get_user_groups():
+def get_groups():
     try:
         auth_header = request.headers.get('Authorization')
         if not auth_header:
