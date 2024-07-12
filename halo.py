@@ -6,6 +6,7 @@ import os
 import requests
 import json
 import uuid
+import jwt
 
 
 app = Flask(__name__)
@@ -420,7 +421,7 @@ def login():
             'business_unit_name': business_unit_name,
             'business_unit_id': business_unit_id,
             'cp4d_token': cp4d_token,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expiration time
+            'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
         }
 
         secret = os.getenv('secret') if os.getenv('secret') else secret_key
@@ -545,7 +546,6 @@ def get_catalogs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 file_name = 'ApprovalData.json'
