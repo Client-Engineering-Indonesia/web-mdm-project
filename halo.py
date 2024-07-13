@@ -7,7 +7,12 @@ import requests
 import json
 import uuid
 import jwt
-
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 app = Flask(__name__)
 CORS(app)
@@ -18,7 +23,6 @@ def current_timestamp():
     current_timestamp = datetime.now()
     formatted_timestamp = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
     return formatted_timestamp
-
 
 @app.route('/')
 def hello_world():
@@ -345,7 +349,6 @@ def get_roles_and_permissions():
         return jsonify({'error': str(e)}), 500
 
 # login
-
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -569,7 +572,6 @@ def get_catalogs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 current_directory = os.path.dirname(os.path.abspath(__file__))
 file_name = 'ApprovalData.json'
 file_path = os.path.join(current_directory, file_name)
@@ -585,7 +587,6 @@ def load_data():
 def save_data(data):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
-
 
 @app.route('/get_approval_data', methods=['GET'])
 def get_approval_data():
@@ -665,6 +666,83 @@ def create_request():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Graph Visualization
+dv_data_exchange_df = pd.read_csv('src/data/dv_log_processed.csv')
+view_df = pd.read_csv('src/data/table_access_log.csv')
+table_access_count = view_df['table_accessed'].value_counts()
+VIRTUALIZED_DATA = dv_data_exchange_df["dv_table_name"].unique()
+
+def create_graph(dv_data_exchange_df, view_df):
+    # Create a directed graph
+    G = nx.DiGraph()
+
+    # Process the DataFrame to add or remove edges based on actions
+    for index, row in dv_data_exchange_df.iterrows():
+        table = row['dv_table_name']
+        target = row['dv_user_target']
+        owner = row['initiator_id']
+        if row['action'] == 'data-virtualization..implicit_grant.configure':
+            G.add_edge(owner, table)
+        if row['action'] == 'data-virtualization.grant.configure':
+            G.add_edge(owner, table)
+            G.add_edge(table, target)
+        elif row['action'] == 'data-virtualization.revoke.configure':
+            if G.has_edge(table, target):
+                G.remove_edge(table, target)
+    # Add custom metrics to nodes
+    for node in G.nodes():
+        if node in VIRTUALIZED_DATA:
+            G.nodes[node]['access_count'] = table_access_count[node]
+    return G
+
+def visualize_graph(G, filename):
+    # Define node colors based on node type (table or user)
+    node_colors = []
+    db_image = mpimg.imread('src/data/person1.png')
+    person_image = mpimg.imread('src/data/database2.png')
+
+    # Draw the graph
+    plt.figure(figsize=(20, 20))
+    pos = nx.circular_layout(G)
+    fig, ax = plt.subplots(figsize=(35, 12))
+    plt.title('Access Graph')
+
+    for node in G.nodes():
+        x, y = pos[node]
+        if any(node == row['dv_table_name'] for _, row in dv_data_exchange_df.iterrows()):
+            img = person_image
+        else:
+            img = db_image
+        imagebox = OffsetImage(img, zoom=0.5)
+        ab = AnnotationBbox(imagebox, (x, y + 0.1), frameon=False)
+        ax.add_artist(ab)
+
+    # Get node labels for visualization
+    node_labels = {}
+    for node in G.nodes():
+        if node not in VIRTUALIZED_DATA:
+            node_labels[node] = node
+        else:
+            node_labels[node] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
+    
+    nx.draw_circular(G, with_labels=True, node_color=node_colors, labels=node_labels, edge_color='gray', node_size=3000, font_size=8, font_weight='200', arrows=True)
+    
+    plt.savefig(filename)
+    plt.close()
+
+@app.route('/get_graph')
+def get_graph_image():
+    try: 
+        filename = 'src/data/graph.png'
+        # G = create_graph(dv_data_exchange_df, view_df)
+        # visualize_graph(G, filename)
+
+        return jsonify({"status": "Success", "file_path": filename}), 200
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug= True)
