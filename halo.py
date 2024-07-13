@@ -219,7 +219,32 @@ def get_users():
         response = requests.get(url, headers=headers, verify=False)
 
         if response.status_code == 200:
-            return jsonify(response.json()), 200
+            users = response.json()
+            filtered_users = []
+            for user in users:
+                groups = user.get('groups', [])
+                business_unit_name = None
+                business_unit_id = None
+
+                for group in groups:
+                    name = group.get('name')
+                    if name and 'business' in name.lower():  # Check if 'business' is in the name
+                        business_unit_name = name
+                        business_unit_id = group.get('group_id')
+                        break  # Stop after finding the first match
+
+                filtered_user = {
+                    'username': user.get('username'),
+                    'email': user.get('email'),
+                    'business_unit_group': business_unit_name,
+                    'business_unit_group_id': business_unit_id,
+                    'user_roles': user.get('user_roles'),
+                    'created_timestamp': user.get('created_timestamp'),
+                    'current_account_status': user.get('current_account_status')
+                }
+                filtered_users.append(filtered_user)
+
+            return jsonify(filtered_users), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
