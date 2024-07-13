@@ -10,6 +10,7 @@ import Publish from './components/Publish/Publish';
 import Roles from './components/roles/Roles';
 import Business_Unit from './components/business-unit/Business_Unit';
 import Cookies from 'js-cookie';
+import GraphVisualization from './components/graph/GraphVisualization';
 
 import {
   Header,
@@ -122,6 +123,11 @@ function App() {
                 Audit and Logs
               </SideNavMenuItem>
             </SideNavMenu>
+            <SideNavMenu title="Visualization">
+              <SideNavMenuItem href="/access_graph">
+                Access Graph
+              </SideNavMenuItem>
+            </SideNavMenu>
           </SideNavItems>
         </SideNav>
       </Header>
@@ -181,6 +187,11 @@ function App() {
         <Router>
           <Routes>
             <Route path='/roles' element={<Roles />} />
+          </Routes>
+        </Router>
+        <Router>
+          <Routes>
+            <Route path='/access_graph' element={<GraphVisualization />} />
           </Routes>
         </Router>
       </section>
