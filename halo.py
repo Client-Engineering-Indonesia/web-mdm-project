@@ -16,7 +16,7 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 app = Flask(__name__)
 CORS(app)
-secret = os.getenv('secret') if os.getenv('secret') else secret_key
+secret = os.getenv('secret') 
 cp4d_url = os.getenv('cp4d_url')
 
 def current_timestamp():
