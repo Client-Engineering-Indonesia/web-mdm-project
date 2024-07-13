@@ -453,7 +453,7 @@ def decodeJwtToken(token):
         decoded_token = jwt.decode(token, secret, algorithms=['HS256'])
         return decoded_token
     except jwt.ExpiredSignatureError:
-        return jwt.Expire
+        return jsonify({'error': 'Expired token'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid token'}), 401
 
@@ -651,7 +651,7 @@ def create_request():
             "expire_date": data.get('duration')
         }
 
-        json_path = 'src/data/business-unit-data.json'
+        json_path = file_path
 
         with open(json_path, 'r') as file:
             data = json.load(file)

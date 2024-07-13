@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const url = 'http://52.118.170.239:8443';
-// const url = 'http://127.0.0.1:5000';
+// const url = 'http://52.118.170.239:8443';
 
 
 export const fetchToken = async () => {
