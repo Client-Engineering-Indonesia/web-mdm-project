@@ -4,14 +4,14 @@ import axios from 'axios';
 import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell, Button, Search, Dropdown, IconButton, Pagination } from '@carbon/react';
 import { Add, TrashCan, Power, CopyFile, Edit } from '@carbon/icons-react';
 
-const url1 = 'http://';
-const url2 = 'http://127.0.0.1:5000';
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
 
 function Business_Unit(){
 
     const getToken = async () => {
         try {
-            const response = await axios.post(`${url2}/get_token`);
+            const response = await axios.post(`${url}/get_token`);
             return response.data.token; // Adjust this according to your API response structure
         } catch (error) {
             console.error('Error fetching token:', error);
@@ -28,11 +28,11 @@ function Business_Unit(){
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             };
-            const response= await axios.get(`${url2}//get_business_units`, {headers: requestHeaders});
+            const response= await axios.get(`${url}//get_business_units`, {headers: requestHeaders});
             console.log(response);
             console.log(response.data);
             console.log(response.data.data);
-            
+
             let tempData = response.data.data;
             let roleIDArr = [];
             let roleNameArr = [];

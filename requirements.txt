@@ -1,5 +1,9 @@
 Flask
 flask-cors
-requests
 python-dotenv
-jwt
+requests
+PyJWT
+pandas
+networkx
+matplotlib
+

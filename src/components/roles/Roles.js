@@ -4,8 +4,10 @@ import { IconButton, Table, TableHead, TableRow, TableHeader, TableBody, TableCe
 import axios from 'axios';
 import { Add, TrashCan, Power } from '@carbon/icons-react';
 
-const url1 = 'http://';
-const url2 = 'http://127.0.0.1:5000';
+
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+
 
 function Roles() {
     const [data, setData] = useState([]); // Initialize state as an empty array
@@ -16,7 +18,7 @@ function Roles() {
 
     const getToken = async () => {
         try {
-            const response = await axios.post(`${url2}/get_token`);
+            const response = await axios.post(`${url}/get_token`);
             return response.data.token; // Adjust this according to your API response structure
         } catch (error) {
             console.error('Error fetching token:', error);
@@ -31,7 +33,7 @@ function Roles() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             };
-            const response = await axios.get(`${url2}/get_roles`, { headers: requestHeaders });
+            const response = await axios.get(`${url}/get_roles`, { headers: requestHeaders });
             console.log(response);
             setData(response.data.data); // Ensure this matches the structure of your API response
         } catch (error) {

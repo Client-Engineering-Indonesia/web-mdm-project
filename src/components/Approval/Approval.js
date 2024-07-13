@@ -33,6 +33,9 @@ const headers = [
     { key: 'expire_date', header: 'Expire Date' }
 ];
 
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+
 const Approval = () => {
 
     const [open, setOpen] = useState(false);
@@ -51,7 +54,7 @@ const Approval = () => {
     // Define fetchData function
     const fetchData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/get_approval_data');
+            const response = await fetch(`${url}/get_approval_data`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -83,7 +86,7 @@ const Approval = () => {
             if (window.confirm(confirmMessage)) {
                 const newStatus = action === 'approve' ? true : false;
 
-                axios.put(`http://localhost:5000/update_approval_status/${row.id}`, { status: newStatus })
+                axios.put(`${url}/update_approval_status/${row.id}`, { status: newStatus })
                     .then(response => {
                         console.log(`${action} request`, response.data.message);
                         fetchData();
