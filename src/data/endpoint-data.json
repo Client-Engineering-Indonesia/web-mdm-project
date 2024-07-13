@@ -1,0 +1,77 @@
+[
+    {
+        "endpoint_name": "Endpoint 1",
+        "status": "Active",
+        "engine": "postgresql",
+        "hostname": "localhost",
+        "port": 5432,
+        "db_name": "db1",
+        "user_access": "user 1",
+        "created_at": "2024-01-01 00.00.00",
+        "subscribed": true,
+        "owner_business_unit_id": 10001,
+        "viewers": [
+            "1000331012"
+        ]
+    },
+    {
+        "endpoint_name": "Endpoint 2",
+        "status": "Active",
+        "engine": "postgresql",
+        "hostname": "localhost",
+        "port": 5432,
+        "db_name": "db1",
+        "user_access": "user 1",
+        "created_at": "2024-01-01 00.00.00",
+        "subscribed": true,
+        "owner_business_unit_id": 10001,
+        "viewers": [
+            "1000331014"
+        ]
+    },
+    {
+        "endpoint_name": "Endpoint 3",
+        "status": "Active",
+        "engine": "postgresql",
+        "hostname": "localhost",
+        "port": 5432,
+        "db_name": "db1",
+        "user_access": "user 1",
+        "created_at": "2024-01-01 00.00.00",
+        "subscribed": true,
+        "owner_business_unit_id": 10001,
+        "viewers": [
+            "1000331012"
+        ]
+    },
+    {
+        "endpoint_name": "Endpoint 4",
+        "status": "Active",
+        "engine": "postgresql",
+        "hostname": "localhost",
+        "port": 5432,
+        "db_name": "db1",
+        "user_access": "user 1",
+        "created_at": "2024-01-01 00.00.00",
+        "subscribed": true,
+        "owner_business_unit_id": 10002,
+        "viewers": [
+            "1000331012"
+        ]
+    },
+    {
+        "id": "ce5ce751",
+        "endpoint_name": "New Endpoint 1",
+        "status": "Active",
+        "username": "steward_bu_a",
+        "engine": "MYSQL",
+        "hostname": "localhost",
+        "schema": "schema",
+        "owner_business_unit_id": 10001,
+        "viewers": [
+            "1000331012"
+        ],
+        "created_at": "2024-07-13 21:28:26",
+        "subscribed": true
+    }
+]

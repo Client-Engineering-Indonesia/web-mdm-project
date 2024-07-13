@@ -21,7 +21,7 @@ import './Approval.css';
 const headers = [
     { key: 'is_approved', header: 'Status' },
     { key: 'requestor_business_unit', header: 'Business Unit' },
-    { key: 'requestor_username', header: 'UserNmae' },
+    { key: 'requestor_username', header: 'UserName' },
     { key: 'requestor_role', header: 'Role' },
     { key: 'table_name', header: 'Table Name' },
     { key: 'owner_email', header: 'Email' },
@@ -34,7 +34,7 @@ const headers = [
 ];
 
 const url = 'http://52.118.170.239:8443';
-// const url = 'http://127.0.0.1:5000';
+// const url = 'http://52.118.170.239:8443';
 
 const Approval = () => {
 
