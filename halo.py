@@ -460,6 +460,92 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/add_new_role', methods=['POST'])
+def add_new_role():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        role_name = data.get('role_name')
+        description = data.get('description')
+        permission = data.get('permission')
+
+        # if not username or not user_roles:
+        #     return jsonify({'error': 'Missing required parameters'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/user/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        payload = {
+            'role_name': role_name,
+            'description': description,
+            'permission': permission
+        }
+
+        response = requests.put(url, headers=headers, json=payload, verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/assign_role/<username>', methods=['PUT'])
+def assign_role(username):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        username = data.get('username')
+        user_roles = data.get('user_roles')
+
+        if not username or not user_roles:
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/user/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        payload = {
+            'username': username,
+            'user_roles': user_roles
+        }
+
+        response = requests.put(url, headers=headers, json=payload, verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
 @app.route('/user_info', methods=['POST'])
 def get_user_info_from_jwt():
     data = request.get_json()
