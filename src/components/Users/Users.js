@@ -1,5 +1,5 @@
-import './Users.css'
-import React from 'react';
+import './Users.css';
+import React, { useState } from 'react';
 import {
     DataTable,
     Table,
@@ -8,113 +8,62 @@ import {
     TableHeader,
     TableBody,
     TableCell,
-    Button, Search, Dropdown, IconButton, Pagination
+    IconButton,
+    Search,
+    TextInput,
+    Button,
+    Dropdown,
 } from '@carbon/react';
-import { Add, CopyFile, TrashCan, Edit, Power } from '@carbon/icons-react';
-
+import { Add, CopyFile, TrashCan, Edit, Power, Close } from '@carbon/icons-react';
 
 const headers = [
-    {
-        key: 'BusinessUnit',
-        header: 'Business Unit',
-    },
-    {
-        key: 'UserName',
-        header: 'User Name',
-    },
-    {
-        key: 'Email',
-        header: 'Email',
-    },
-    {
-        key: 'UserGroup',
-        header: 'User Group',
-    },
-    {
-        key: 'Role',
-        header: 'Role',
-    },
-    {
-        key: 'FullName',
-        header: 'Full Name',
-    },
-    {
-        key: 'LastLogin',
-        header: 'Last Login',
-    },
-    {
-        key: 'CreatedDate',
-        header: 'Created Date',
-    },
-    {
-        key: 'ValidUntil',
-        header: 'Valid Until',
-    },
-    {
-        key: 'IsActive',
-        header: 'Is Active',
-    },
+    { key: 'BusinessUnit', header: 'Business Unit' },
+    { key: 'UserName', header: 'User Name' },
+    { key: 'Email', header: 'Email' },
+    { key: 'UserGroup', header: 'User Group' },
+    { key: 'Role', header: 'Role' },
+    { key: 'FullName', header: 'Full Name' },
+    { key: 'LastLogin', header: 'Last Login' },
+    { key: 'CreatedDate', header: 'Created Date' },
+    { key: 'ValidUntil', header: 'Valid Until' },
+    { key: 'IsActive', header: 'Is Active' },
 ];
 
 const rows = [
     {
         id: 'a',
         BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'Bambank@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
-    },
-    {
-        id: 'b',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'Syarifudin@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
-    },
-    {
-        id: 'c',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'moreno@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
-    },
-    {
-        id: 'd',
-        BusinessUnit: 'Business Unit 1',
-        UserName: 'user_name_1',
-        Email: 'farul@ibm.com',
-        UserGroup: 'User Group 1',
-        Role: 'Role 1',
-        FullName: 'Full Name 1',
-        LastLogin: 'Last Login 1',
-        CreatedDate: 'Created Date 1',
-        ValidUntil: 'Valid Until 1',
-        IsActive: 'Active',
+        UserName: 'svc_adm_1',
+        Email: 'svc_adm_1@BU_1.com',
+        UserGroup: 'ADM_GRP',
+        Role: 'Admin',
+        FullName: 'Administrator',
+        LastLogin: '2024-01-01 00:00',
+        CreatedDate: '2024-01-01',
+        ValidUntil: '9999-12-31',
+        IsActive: 'TRUE',
     },
 ];
 
+const businessUnits = [
+    { id: '1', text: 'Business Unit 1' },
+    { id: '2', text: 'Business Unit 2' },
+];
 
-
+const userGroups = [
+    { id: '1', text: 'VM-GRP' },
+    { id: '2', text: 'MGR-GRP' },
+];
 
 function USERS() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [selectedBusinessUnit, setSelectedBusinessUnit] = useState(null);
+    const [selectedUserGroup, setSelectedUserGroup] = useState(null);
+
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     return (
         <section className='users'>
             <div className='users-content'>
@@ -137,7 +86,7 @@ function USERS() {
                             <p>Duplicate</p>
                         </div>
                         <div className='menu-name-images'>
-                            <IconButton label="edit" kind='secondary'>
+                            <IconButton label="edit" kind='secondary' onClick={toggleSidebar}>
                                 <Edit className='button-edit' />
                             </IconButton>
                             <p>Edit</p>
@@ -156,7 +105,15 @@ function USERS() {
                         </div>
                     </div>
                     <div className='search'>
-                        <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => { }} onKeyDown={() => { }} />
+                        <Search
+                            size="lg"
+                            placeholder="Search"
+                            labelText="Search"
+                            closeButtonLabelText="Clear search input"
+                            id="search-1"
+                            onChange={() => { }}
+                            onKeyDown={() => { }}
+                        />
                     </div>
                 </div>
 
@@ -185,24 +142,59 @@ function USERS() {
                             </Table>
                         )}
                     </DataTable>
-                    <Pagination
-                        backwardText="Previous page"
-                        forwardText="Next page"
-                        itemsPerPageText="Items per page:"
-                        onChange={function noRefCheck() { }}
-                        page={1}
-                        pageSize={10}
-                        pageSizes={[
-                            10,
-                            20,
-                            30,
-                            40,
-                            50
-                        ]}
-                        size="md"
-                        totalItems={103}
-                    />
                 </div>
+            </div>
+
+            <div className={`edit-sidebar ${isSidebarOpen ? 'active' : ''}`}>
+                <IconButton
+                    label="Close"
+                    onClick={toggleSidebar}
+                    className="close-button"
+                >
+                    <Close />
+                </IconButton>
+                <h3 style={{ marginBottom: '1rem' }}>Edit User</h3>
+                <form>
+                    <Dropdown
+                        id="businessUnit"
+                        label="Business Unit"
+                        items={businessUnits}
+                        itemToString={item => (item ? item.text : '')}
+                        onChange={({ selectedItem }) => setSelectedBusinessUnit(selectedItem)}
+                        placeholder="Select Business Unit"
+                        style={{ marginBottom: '1rem' }}
+                    />
+                    <Dropdown
+                        id="userGroup"
+                        label="User Group"
+                        items={userGroups}
+                        itemToString={item => (item ? item.text : '')}
+                        onChange={({ selectedItem }) => setSelectedUserGroup(selectedItem)}
+                        placeholder="Select User Group"
+                        style={{ marginBottom: '1rem' }}
+
+                    />
+                    <TextInput id="userName" labelText="User Name" placeholder="Enter User Name" className='input-text' />
+                    <TextInput id="email" labelText="Email" placeholder="Enter Email" className='input-text' />
+                    <div>
+                        <label>Role:</label>
+                        <div className='radio-container'>
+                            <label>
+                                <input type="radio" name="role" value="Admin" /> Admin
+                            </label>
+                            <label>
+                                <input type="radio" name="role" value="Manager" /> Manager
+                            </label>
+                            <label>
+                                <input type="radio" name="role" value="Steward" /> Steward
+                            </label>
+                        </div>
+                    </div>
+                    <div className='button-container'>
+                        <Button kind="primary" onClick={() => { }} style={{ width: '50%' }}>Submit</Button>
+                        <Button kind="secondary" onClick={toggleSidebar} style={{ width: '50%' }}>Cancel</Button>
+                    </div>
+                </form>
             </div>
         </section>
     );
