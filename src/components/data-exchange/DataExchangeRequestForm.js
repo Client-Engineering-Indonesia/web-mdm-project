@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
 
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
+
 const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
@@ -59,7 +62,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
       };
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/create_request', {
+        const response = await fetch(`${url}/create_request`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

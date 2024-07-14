@@ -21,7 +21,7 @@ import './Approval.css';
 const headers = [
     { key: 'is_approved', header: 'Status' },
     { key: 'requestor_business_unit', header: 'Business Unit' },
-    { key: 'requestor_username', header: 'UserNmae' },
+    { key: 'requestor_username', header: 'UserName' },
     { key: 'requestor_role', header: 'Role' },
     { key: 'table_name', header: 'Table Name' },
     { key: 'owner_email', header: 'Email' },
@@ -32,6 +32,9 @@ const headers = [
     { key: 'approved_timestamp', header: 'Approved Timestamp' },
     { key: 'expire_date', header: 'Expire Date' }
 ];
+
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
 
 const Approval = () => {
 
@@ -51,7 +54,7 @@ const Approval = () => {
     // Define fetchData function
     const fetchData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/get_approval_data');
+            const response = await fetch(`${url}/get_approval_data`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -83,7 +86,7 @@ const Approval = () => {
             if (window.confirm(confirmMessage)) {
                 const newStatus = action === 'approve' ? true : false;
 
-                axios.put(`http://localhost:5000/update_approval_status/${row.id}`, { status: newStatus })
+                axios.put(`${url}/update_approval_status/${row.id}`, { status: newStatus })
                     .then(response => {
                         console.log(`${action} request`, response.data.message);
                         fetchData();

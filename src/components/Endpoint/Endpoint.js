@@ -13,6 +13,11 @@ import {
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Add, CopyFile, TrashCan, Edit, Power } from '@carbon/icons-react';
 
+
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
+
+
 export default function ENDPOINT() {
 
     

@@ -3,6 +3,11 @@ import { React, useState, useEffect } from 'react';
 import {  Button, Form, TextInput, Stack } from '@carbon/react';
 import Cookies from 'js-cookie';
 
+
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
+
+
 export default function LOGIN () {
     const [formData, setFormData] = useState({
         username: '',
@@ -23,14 +28,18 @@ export default function LOGIN () {
             password: formData.password
         };
 
+        // console.log(loginData);
+
         try {
-            const response = await fetch('http://127.0.0.1:5000/login', {
+            const response = await fetch(`${url}/login`, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(loginData),
             });
+
+            // console.log('Response:', response);
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -39,7 +48,7 @@ export default function LOGIN () {
             const responseData = await response.json();
             Cookies.set('web_token', responseData.jwt_token, { expires: 7 });
             console.log('Response from server:', responseData);
-            window.location.replace('http://localhost:3000/business_unit');
+            window.location.replace('/business_unit');
         } catch (error) {
             console.error('Error submitting form:', error);
         }

@@ -16,7 +16,7 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 app = Flask(__name__)
 CORS(app)
-secret = os.getenv('secret') if os.getenv('secret') else secret_key
+secret = os.getenv('secret') 
 cp4d_url = os.getenv('cp4d_url')
 
 def current_timestamp():
@@ -478,7 +478,7 @@ def decodeJwtToken(token):
         decoded_token = jwt.decode(token, secret, algorithms=['HS256'])
         return decoded_token
     except jwt.ExpiredSignatureError:
-        return jwt.Expire
+        return jsonify({'error': 'Expired token'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid token'}), 401
 
@@ -596,7 +596,8 @@ def get_catalogs():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
+# Approval 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 file_name = 'ApprovalData.json'
 file_path = os.path.join(current_directory, file_name)
@@ -624,7 +625,6 @@ def get_approval_data():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 @app.route('/update_approval_status/<id>', methods=['PUT'])
 def update_approval_status(id):
     try:
@@ -676,7 +676,7 @@ def create_request():
             "expire_date": data.get('duration')
         }
 
-        json_path = 'src/data/business-unit-data.json'
+        json_path = file_path
 
         with open(json_path, 'r') as file:
             data = json.load(file)
@@ -685,6 +685,77 @@ def create_request():
 
         # Write the updated data back to the JSON file
         with open(json_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        
+        return jsonify({"status": "Success", "data": data}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Endpoint 
+endpoint_file_path = 'src/data/endpoint-data.json'
+
+@app.route('/get_endpoint_data', methods=['GET'])
+def get_endpoint_data():
+    try: 
+        req_body = request.get_json()
+
+        user_info = decodeJwtToken(req_body.get('token'))
+        internal_result = []
+        external_result = []
+
+        with open(endpoint_file_path, 'r') as file:
+            endpoints = json.load(file)
+            for endpoint in endpoints:
+                if endpoint["owner_business_unit_id"] == user_info["business_unit_id"]:
+                    internal_result.append(endpoint)
+                elif user_info["uid"] in endpoint["viewers"] and endpoint["owner_business_unit_id"] != user_info["business_unit_id"]:
+                    external_result.append(endpoint)
+        
+        result = {
+            "internal": internal_result,
+            "external": external_result
+        }
+
+        return jsonify({
+            "result": result
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/create_new_endpoint', methods=['POST'])
+def create_new_endpoint():
+    try: 
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        user_info = decodeJwtToken(data.get('token'))
+        unique_id = str(uuid.uuid4())[:8]
+
+        new_endpoint = {
+            "id": unique_id,
+            "username":  user_info['username'],
+            "owner_business_unit_id": user_info['business_unit_id'],
+            "viewers": [user_info["uid"]],
+            "created_at": current_timestamp(),
+            "endpoint_name": data.get("endpoint_name"),
+            "status": data.get('status'),
+            "engine": data.get('engine'),
+            "hostname": data.get('hostname'),
+            "schema": data.get('schema'),
+            "subscribed": data.get("subscribed")
+        }
+
+        with open(endpoint_file_path, 'r') as file:
+            data = json.load(file)
+
+        data.append(new_endpoint)
+
+        # Write the updated data back to the JSON file
+        with open(endpoint_file_path, 'w') as file:
             json.dump(data, file, indent=4)
         
         return jsonify({"status": "Success", "data": data}), 200
