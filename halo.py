@@ -458,7 +458,7 @@ def login():
 
             # Assume a user only has one group role
             for role in roles_response_json["rows"]:
-                if role["id"] == user_info["group_roles"][0]:
+                if role["id"] == user_info["user_roles"][0]:
                     user_role = role["doc"]["role_name"]
 
         # Create JWT token
@@ -654,21 +654,26 @@ def update_approval_status(id):
     try:
         new_status = request.json.get('status')
         current_time = datetime.now()
+        user_info = decodeJwtToken(request.json.get('webtoken'))
+        
+        if 'role' in user_info and 'admin' not in user_info["role"].lower():
+            return jsonify({'error': 'You do not have permission to approve this request'}), 400
+    
+        else: 
+            data = load_data()
+            updated = False
+            for entry in data:
+                if entry['id'] == id:
+                    entry['is_approved'] = new_status
+                    entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                    updated = True
+                    break
 
-        data = load_data()
-        updated = False
-        for entry in data:
-            if entry['id'] == id:
-                entry['is_approved'] = new_status
-                entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
-                updated = True
-                break
-
-        if updated:
-            save_data(data)
-            return jsonify({'message': f'Status updated for ID {id}'}), 200
-        else:
-            return jsonify({'error': f'ID {id} not found'}), 404
+            if updated:
+                save_data(data)
+                return jsonify({'message': f'Status updated for ID {id}'}), 200
+            else:
+                return jsonify({'error': f'ID {id} not found'}), 404
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -680,16 +685,18 @@ def create_request():
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
+        
+        user_info = decodeJwtToken(data.get('webtoken'))
 
         timestamp = current_timestamp()
         unique_id = str(uuid.uuid4())[:8]
 
         new_request = {
             "id": unique_id,
-            "is_approved": False,
-            "requestor_business_unit": data.get('business_unit'),
-            "requestor_username":  data.get('username'),
-            "requestor_role": data.get('role'),
+            "is_approved": True if 'admin' in user_info["role"].lower() else False,
+            "requestor_business_unit": user_info["business_unit_name"],
+            "requestor_username":  data.get('requestor_username'),
+            "requestor_role": data.get('requestor_role'),
             "table_name": data.get('table_name'),
             "owner_email": data.get('owner_email'),
             "owner_name": data.get('owner_name'),
@@ -724,7 +731,7 @@ def get_endpoint_data():
     try: 
         req_body = request.get_json()
 
-        user_info = decodeJwtToken(req_body.get('token'))
+        user_info = decodeJwtToken(req_body.get('webtoken'))
         internal_result = []
         external_result = []
 

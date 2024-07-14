@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
+import Cookies from 'js-cookie';
 
 const url = 'http://52.118.170.239:8443';
 // const url = 'http://52.118.170.239:8443';
@@ -49,6 +50,8 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
+      const webToken = Cookies.get('web_token');
+
       const requestData = {
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: formData.requestor_username,
@@ -59,6 +62,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         owner_phone: formData.owner_phone,
         description: formData.description,
         duration: formData.duration,
+        webtoken: webToken
       };
 
       try {
