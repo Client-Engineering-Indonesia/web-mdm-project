@@ -24,7 +24,7 @@ export default function ENDPOINT() {
 
     
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isToken, setIsToken] = useState(Cookies.get('cp4d_token') || '');
+    const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
 
     const toggleModal = () => {
         setIsModalOpen(prevState => !prevState);
@@ -40,29 +40,29 @@ export default function ENDPOINT() {
 
     useEffect(() => {
         // If you need to update the token dynamically, you can still do so here
-        const token = Cookies.get('cp4d_token');
+        const token = Cookies.get('web_token');
         setIsToken(token || '');
         fetchData();
     }, []); // This runs once on component mount
 
     const fetchData = async () => {
-        try {
-            if(isToken !== ''){
-            const requestHeaders = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${isToken}`
-            };
-            console.log(isToken);
+        const webToken= Cookies.get('web_token');
+        const requestData= {
+            webtoken: webToken
+        };
 
-            const response = await axios.get(`${url}/get_endpoint_data`, { headers: requestHeaders });
-            console.log(response);
-            setData(response.data.data); // Ensure this matches the structure of your API response
-        }
+        try{
+            const response = await axios.get(`${url}/get_endpoint_data`, {
+                // headers: {
+                //     'Content-Type': 'application/json',
+                // },
+                body: JSON.stringify(requestData),
+            });
+
+            console.log('Response:', response.data.data);
+            setData(response.data.data);
         } catch (error) {
-            console.error('Error fetching data:', error);
-            setError(error);
-        } finally {
-            setLoading(false);
+            console.error('Error:', error);
         }
     };
 
@@ -98,8 +98,8 @@ export default function ENDPOINT() {
             header: 'Database Name',
         },
         {
-            key: 'user_access',
-            header: 'User Access',
+            key: 'table_owner',
+            header: 'Table Owner',
         },
         {
             key: 'created_at',
