@@ -18,263 +18,23 @@ import { CheckmarkOutline, MisuseOutline, View } from '@carbon/icons-react';
 import axios from 'axios';
 import './Approval.css';
 
-const headersPending = [
-    { key: 'businessUnit', header: 'Business Unit' },
-    { key: 'datasetName', header: 'Dataset Name' },
-    { key: 'databaseName', header: 'Database Name' },
-    { key: 'tableName', header: 'Table Name' },
-    { key: 'requestor', header: 'Requestor' },
-    { key: 'requestTimestamp', header: 'Request Timestamp' },
-    { key: 'role', header: 'Role' },
-    { key: 'duration', header: 'Duration' },
-    { key: 'type', header: 'Type' },
+const headers = [
+    { key: 'is_approved', header: 'Status' },
+    { key: 'requestor_business_unit', header: 'Business Unit' },
+    { key: 'requestor_username', header: 'UserName' },
+    { key: 'requestor_role', header: 'Role' },
+    { key: 'table_name', header: 'Table Name' },
+    { key: 'owner_email', header: 'Email' },
+    { key: 'owner_name', header: 'Name' },
+    { key: 'owner_phone', header: 'Phone' },
+    { key: 'description', header: 'Description' },
+    { key: 'request_timestamp', header: 'Request Timestamp' },
+    { key: 'approved_timestamp', header: 'Approved Timestamp' },
+    { key: 'expire_date', header: 'Expire Date' }
 ];
 
-const headersActive = [
-    { key: 'businessUnit', header: 'Business Unit' },
-    { key: 'datasetName', header: 'Dataset Name' },
-    { key: 'databaseName', header: 'Database Name' },
-    { key: 'tableName', header: 'Table Name' },
-    { key: 'requestor', header: 'Requestor' },
-    { key: 'requestTimestamp', header: 'Request Timestamp' },
-    { key: 'status', header: 'Status' },
-    { key: 'approvedTimestamp', header: 'Approved Timestamp' },
-    { key: 'expireDate', header: 'Expire Date' },
-];
-
-// const datas = [
-//     {
-//         id: '1',
-//         businessUnit: 'Business Unit 2',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_2',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '15',
-//         type: 'Subscribe',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '2',
-//         businessUnit: 'Business Unit 3',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_3',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '60',
-//         type: 'Subscribe',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '3',
-//         businessUnit: 'Business Unit 4',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_4',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '7',
-//         type: 'Subscribe',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '4',
-//         businessUnit: 'Business Unit 5',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_ORA_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_5',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '30',
-//         type: 'Subscribe',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '5',
-//         businessUnit: 'Business Unit 1',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'SPV_BU_1',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '15',
-//         type: 'Publish',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '6',
-//         businessUnit: 'Business Unit 1',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'SPV_BU_1',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '15',
-//         type: 'Publish',
-//         status: 'Pending',
-//         approvedTimestamp: null,
-//         expireDate: null,
-//     },
-//     {
-//         id: '7',
-//         businessUnit: 'Business Unit 2',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_2',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '15',
-//         type: 'Subscribe',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '8',
-//         businessUnit: 'Business Unit 3',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_3',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '60',
-//         type: 'Subscribe',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '9',
-//         businessUnit: 'Business Unit 4',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_4',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '7',
-//         type: 'Subscribe',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '10',
-//         businessUnit: 'Business Unit 5',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_ORA_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_5',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '30',
-//         type: 'Subscribe',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '11',
-//         businessUnit: 'Business Unit 6',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_6',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         role: 'Viewer',
-//         duration: '15',
-//         type: 'Publish',
-//         status: 'Expired',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '2024-01-01',
-//     },
-// ];
-
-// const rowsActive = [
-//     {
-//         id: '1',
-//         businessUnit: 'Business Unit 2',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_2',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '2',
-//         businessUnit: 'Business Unit 3',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_3',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '3',
-//         businessUnit: 'Business Unit 4',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_MSSQL_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_4',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-//     {
-//         id: '4',
-//         businessUnit: 'Business Unit 5',
-//         datasetName: 'TRANSACTIONSET',
-//         databaseName: 'DB_ORA_1',
-//         tableName: 'TRANSACTION_TABLE_1',
-//         requestor: 'MGR_BU_5',
-//         requestTimestamp: '2024-01-01 00:00:00',
-//         status: 'Active',
-//         approvedTimestamp: '2024-01-01 00:00:00',
-//         expireDate: '9999-12-31',
-//     },
-// {
-//     id: '5',
-//     businessUnit: 'Business Unit 6',
-//     datasetName: 'TRANSACTIONSET',
-//     databaseName: 'DB_MSSQL_1',
-//     tableName: 'TRANSACTION_TABLE_1',
-//     requestor: 'MGR_BU_6',
-//     requestTimestamp: '2024-01-01 00:00:00',
-//     status: 'Expired',
-//     approvedTimestamp: '2024-01-01 00:00:00',
-//     expireDate: '2024-01-01',
-// },
-// ];
-
-// const rowsPending = datas.filter(f => f.status == 'Pending');
-// const rowsActive = datas.filter(f => f.status !== 'Pending');
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
 
 const Approval = () => {
 
@@ -294,19 +54,19 @@ const Approval = () => {
     // Define fetchData function
     const fetchData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/get_approval_data');
+            const response = await fetch(`${url}/get_approval_data`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            console.log('fetch data', data);
+            // console.log('fetch data', data);
 
             // Update state with fetched data
             setDatas(data);
 
             // Filter rows based on status
-            const rowsPending = data.filter(f => f.status === 'Pending');
-            const rowsActive = data.filter(f => f.status !== 'Pending');
+            const rowsPending = data.filter(f => f.is_approved === null);
+            const rowsActive = data.filter(f => f.is_approved !== null);
             setFilteredPendingRows(rowsPending);
             setFilteredActiveRows(rowsActive);
         } catch (error) {
@@ -324,9 +84,9 @@ const Approval = () => {
         if (action === 'approve' || action === 'reject') {
             const confirmMessage = action === 'approve' ? 'Approve this request?' : 'Reject this request?';
             if (window.confirm(confirmMessage)) {
-                const newStatus = action === 'approve' ? 'Active' : 'Rejected';
+                const newStatus = action === 'approve' ? true : false;
 
-                axios.put(`http://localhost:5000/update_approval_status/${row.id}`, { status: newStatus })
+                axios.put(`${url}/update_approval_status/${row.id}`, { status: newStatus })
                     .then(response => {
                         console.log(`${action} request`, response.data.message);
                         fetchData();
@@ -350,7 +110,7 @@ const Approval = () => {
         setSearchInputPending(value);
 
         const filteredPending = datas.filter(row =>
-            row.status === 'Pending' &&
+            row.is_approved === null &&
             Object.values(row).some(cellValue =>
                 String(cellValue).toLowerCase().includes(value)
             )
@@ -364,7 +124,7 @@ const Approval = () => {
         setSearchInputActive(value);
 
         const filteredActive = datas.filter(row =>
-            row.status !== 'Pending' &&
+            row.is_approved !== null &&
             Object.values(row).some(cellValue =>
                 String(cellValue).toLowerCase().includes(value)
             )
@@ -391,11 +151,27 @@ const Approval = () => {
         pageActive * itemsPerPage
     );
 
+    const renderApprovalStatus = (row) => {
+        if (row.cells[0].value === null) return 'Pending';
+        return row.cells[0].value ? 'Approved' : 'Rejected';
+    };
+
     const renderFormFields = () => {
-        console.log('selected Row', selectedRow);
+        // console.log('selected Row', selectedRow);
         if (!selectedRow) return null;
 
-        const isPending = selectedRow.cells.some(cell => cell.info.header === 'Role');
+        const getHeaderLabel = (key) => {
+            const header = headers.find(header => header.key === key);
+            return header ? header.header : key;
+        };
+
+        const getFormattedValue = (key, value) => {
+            if (key === 'is_approved') {
+                if (value === null) return 'Pending';
+                return value ? 'Approved' : 'Rejected';
+            }
+            return value;
+        };
 
         return (
             <FormGroup legendText="">
@@ -403,8 +179,8 @@ const Approval = () => {
                     <TextInput
                         key={cell.id}
                         id={cell.id}
-                        labelText={cell.info.header}
-                        value={cell.value}
+                        labelText={getHeaderLabel(cell.info.header)}
+                        value={getFormattedValue(cell.info.header, cell.value)}
                         readOnly
                     />
                 ))}
@@ -435,7 +211,7 @@ const Approval = () => {
                         </div>
                     </div>
 
-                    <DataTable rows={paginatedPendingRows} headers={headersPending}>
+                    <DataTable rows={paginatedPendingRows} headers={headers}>
                         {({ rows, headers, getHeaderProps, getRowProps }) => (
                             <TableContainer className="table-container">
                                 <Table>
@@ -451,7 +227,11 @@ const Approval = () => {
                                         {rows.map(row => (
                                             <TableRow {...getRowProps({ row })} key={row.id}>
                                                 {row.cells.map(cell => (
-                                                    <TableCell key={cell.id}>{cell.value}</TableCell>
+                                                    <TableCell key={cell.id}>
+                                                        {cell.id.includes('is_approved')
+                                                            ? renderApprovalStatus(row)
+                                                            : cell.value}
+                                                    </TableCell>
                                                 ))}
 
                                                 <TableCell>
@@ -505,7 +285,7 @@ const Approval = () => {
                         </div>
                     </div>
 
-                    <DataTable rows={paginatedActiveRows} headers={headersActive}>
+                    <DataTable rows={paginatedActiveRows} headers={headers}>
                         {({ rows, headers, getHeaderProps, getRowProps }) => (
                             <TableContainer className="table-container">
                                 <Table>
@@ -521,7 +301,11 @@ const Approval = () => {
                                         {rows.map(row => (
                                             <TableRow {...getRowProps({ row })} key={row.id}>
                                                 {row.cells.map(cell => (
-                                                    <TableCell key={cell.id}>{cell.value}</TableCell>
+                                                    <TableCell key={cell.id}>
+                                                        {cell.id.includes('is_approved')
+                                                            ? renderApprovalStatus(row)
+                                                            : cell.value}
+                                                    </TableCell>
                                                 ))}
                                                 <TableCell>
                                                     {/* <Button size="small" onClick={() => handleActionClick(row, 'show')}>Show</Button> */}
