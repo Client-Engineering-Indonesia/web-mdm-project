@@ -375,6 +375,39 @@ def get_roles_and_permissions():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Get Roles
+@app.route('/get_assignment_roles', methods=['GET'])
+def get_assignment_roles():
+    try:
+        user_info = decodeJwtToken(request.json.get('webtoken'))
+        url = f'{cp4d_url}/usermgmt/v1/roles'
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {user_info["cp4d_token"]}'
+        }
+        response = requests.get(url, headers=headers, verify=False)
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for role in responseJson["rows"]:
+                if ('wkc' not in role["id"].lower() and 'zen' not in role["id"].lower() and 'holding' not in role['doc']['role_name'].lower()):
+                    for i, permission in enumerate(role["doc"]["permissions"]):
+                        role["doc"]["permissions"][i] = permission.replace('_', ' ').title()
+                    resultObject = {
+                        "role_id": role["id"],
+                        "role_name": role["doc"]["role_name"],
+                        "role_description": role["doc"]["description"],
+                        "updated_at": datetime.fromtimestamp(role["doc"]["updated_at"]/1000).strftime('%Y-%m-%d'),
+                        "permissions": role["doc"]["permissions"]
+                    }
+                    resultList.append(resultObject)
+            return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 # login
 @app.route('/login', methods=['POST'])
 def login():
