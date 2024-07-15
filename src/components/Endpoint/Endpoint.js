@@ -30,7 +30,8 @@ export default function ENDPOINT() {
         setIsModalOpen(prevState => !prevState);
     };
 
-    const [data, setData] = useState([]); // Initialize state as an empty array
+    const [internalData, setInternalData] = useState([]);
+    const [externalData, setExternalData] = useState([]);
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState(null); // Error state
 
@@ -45,27 +46,51 @@ export default function ENDPOINT() {
         fetchData();
     }, []); // This runs once on component mount
 
-    const fetchData = async () => {
-        const webToken= Cookies.get('web_token');
-        const requestData= {
-            webtoken: webToken
-        };
+    // const fetchData = async () => {
+    //     const webToken= Cookies.get('web_token');
+    //     const requestData= {
+    //         webtoken: webToken
+    //     };
+    //     try{
+    //         const response = await fetch(`${url}/get_endpoint_data`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //               },
+    //               body: JSON.stringify({ webtoken: webToken }), // Send the token in the body
+    //         });
+    //         console.log(response);
 
-        try{
-            const response = await fetch(`${url}/get_endpoint_data`, {
-                method: 'POST',
+    //         const responseData = await JSON.stringify(response);
+    //         console.log('Response:', responseData);
+    //         setData(responseData);
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+    // };
+
+    const fetchData= async() => {
+        try {
+            const token= isToken;
+            const requestData={
+                webtoken: token
+            };
+
+            const response= await axios.post(`${url}/get_endpoint_data`, requestData, {
                 headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({ webtoken: webToken }), // Send the token in the body
-              });
-
-            console.log('Response:', response);
-            setData(response.data.data);
-        } catch (error) {
+                    'Content-Type': 'application/json', 
+                }
+            });
+            console.log(response);
+            console.log(response.data.result.internal);
+            console.log(response.data.result.external);
+            setInternalData(response.data.result.internal);
+            setExternalData(response.data.result.external);
+            setLoading(false);
+        }catch(error){
             console.error('Error:', error);
         }
-    };
+    }
 
 
     const submithandler = () => {
@@ -107,10 +132,6 @@ export default function ENDPOINT() {
             header: 'Created At',
         },
         {
-            key: 'subscribed',
-            header: 'Subscribed',
-        },
-        {
             key: 'owner_business_unit_id',
             header: 'Owner BU ID',
         },
@@ -130,10 +151,10 @@ export default function ENDPOINT() {
                         <Tab>Internal</Tab>
                         <Tab>External</Tab>
                     </TabList>
-                </Tabs>
-            </div>
 
-            <div className='endpoint-content'>
+                    <TabPanels>
+                        <TabPanel>
+                        <div className='endpoint-content'>
                 <div className='options'>
                     <div className='menus'>
                         <div className='menu-name-images'>
@@ -181,13 +202,20 @@ export default function ENDPOINT() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {Array.isArray(data) && data.map((row, i) => (
+                            {Array.isArray(internalData) && internalData.map((row, i) => (
                                 <TableRow
                                     key={row.id}
                                 >
                                     <TableCell>{row.endpoint_name}</TableCell>
                                     <TableCell>{row.status}</TableCell>
-                                    <TableCell>{row.username}</TableCell>
+                                    <TableCell>{row.engine}</TableCell>
+                                    <TableCell>{row.hostname}</TableCell>
+                                    <TableCell>{row.port}</TableCell>
+                                    <TableCell>{row.db_name}</TableCell>
+                                    <TableCell>{row.table_owner}</TableCell>
+                                    <TableCell>{row.created_at}</TableCell>
+                                    <TableCell>{row.owner_business_unit_id}</TableCell>
+                                    <TableCell>{row.viewers}</TableCell>
 
                                 </TableRow>
                             ))}
@@ -212,6 +240,101 @@ export default function ENDPOINT() {
                     />
                 </div>
             </div>
+                        </TabPanel>
+
+                        <TabPanel>
+                        <div className='endpoint-content'>
+                <div className='options'>
+                    <div className='menus'>
+                        <div className='menu-name-images'>
+                            <IconButton label="add" kind='primary' onClick={toggleModal}>
+                                <Add className='button-add' />
+                            </IconButton>
+                            <p>Add</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="duplicate" kind='secondary'>
+                                <CopyFile className='button-duplicate' />
+                            </IconButton>
+                            <p>Duplicate</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="edit" kind='secondary'>
+                                <Edit className='button-edit' />
+                            </IconButton>
+                            <p>Edit</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="delete" kind='secondary'>
+                                <TrashCan className='button-delete' />
+                            </IconButton>
+                            <p>Delete</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="activate" kind='secondary'>
+                                <Power className='button-activate' />
+                            </IconButton>
+                            <p>Activate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='endpoint-tables'>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((header) => (
+                                    <TableHeader key={header.key} style={{ width: 400 }}>
+                                        {header.header}
+                                    </TableHeader>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.isArray(externalData) && externalData.map((row, i) => (
+                                <TableRow
+                                    key={row.id}
+                                >
+                                    <TableCell>{row.endpoint_name}</TableCell>
+                                    <TableCell>{row.status}</TableCell>
+                                    <TableCell>{row.engine}</TableCell>
+                                    <TableCell>{row.hostname}</TableCell>
+                                    <TableCell>{row.port}</TableCell>
+                                    <TableCell>{row.db_name}</TableCell>
+                                    <TableCell>{row.table_owner}</TableCell>
+                                    <TableCell>{row.created_at}</TableCell>
+                                    <TableCell>{row.owner_business_unit_id}</TableCell>
+                                    <TableCell>{row.viewers}</TableCell>
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <Pagination
+                        backwardText="Previous page"
+                        forwardText="Next page"
+                        itemsPerPageText="Items per page:"
+                        onChange={function noRefCheck() { }}
+                        page={1}
+                        pageSize={10}
+                        pageSizes={[
+                            10,
+                            20,
+                            30,
+                            40,
+                            50
+                        ]}
+                        size="md"
+                        totalItems={103}
+                    />
+                </div>
+            </div>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+            </div>
+
+            
 
             <div className='modal'>
                 <Modal

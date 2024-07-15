@@ -11,12 +11,13 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
     requestor_business_unit: '',
     requestor_username: '',
     requestor_role: 'Viewer',
-    data_set_name: '',
+    data_set_name: '', // table name
     owner_email: '',
     owner_name: '',
     owner_phone: '',
     description: '',
     duration: '',
+    // table schema
   });
 
   const [errors, setErrors] = useState({});
@@ -63,6 +64,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         description: formData.description,
         duration: formData.duration,
         webtoken: webToken
+        // table schema
       };
 
       try {
