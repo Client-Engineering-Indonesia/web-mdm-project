@@ -597,8 +597,6 @@ def assign_role(username):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-
 # Get User Info
 @app.route('/user_info', methods=['POST'])
 def get_user_info_from_jwt():
