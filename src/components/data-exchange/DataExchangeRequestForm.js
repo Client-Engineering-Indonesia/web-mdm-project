@@ -11,12 +11,12 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
     requestor_business_unit: '',
     requestor_username: '',
     requestor_role: 'Viewer',
-    data_set_name: '',  // This will be set to tableName
+    data_set_name: '',
     owner_email: '',
     owner_name: '',
     owner_phone: '',
     description: '',
-    duration: '',  // Duration will be a number
+    duration: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -25,7 +25,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
     if (isOpen) {
       setFormData((prev) => ({
         ...prev,
-        data_set_name: tableName, // Set the table name when the form opens
+        data_set_name: tableName,
       }));
     }
   }, [isOpen, tableName]);
@@ -56,7 +56,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: formData.requestor_username,
         requestor_role: formData.requestor_role,
-        table_name: formData.data_set_name,  // Use data_set_name for API
+        table_name: formData.data_set_name,
         owner_email: formData.owner_email,
         owner_name: formData.owner_name,
         owner_phone: formData.owner_phone,
