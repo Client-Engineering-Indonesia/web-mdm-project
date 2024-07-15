@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
+import Cookies from 'js-cookie';
+
+const url = 'http://52.118.170.239:8443';
+// const url = 'http://52.118.170.239:8443';
 
 const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
   const [formData, setFormData] = useState({
@@ -46,6 +50,8 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
+      const webToken = Cookies.get('web_token');
+
       const requestData = {
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: formData.requestor_username,
@@ -56,10 +62,11 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         owner_phone: formData.owner_phone,
         description: formData.description,
         duration: formData.duration,
+        webtoken: webToken
       };
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/create_request', {
+        const response = await fetch(`${url}/create_request`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
