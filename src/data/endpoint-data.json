@@ -6,8 +6,8 @@
         "hostname": "localhost",
         "port": 5432,
         "db_name": "db1",
-        "user_access": "user 1",
-        "created_at": "2024-01-01 00.00.00",
+        "table_owner": "user 1",
+        "created_at": "2024-01-01",
         "subscribed": true,
         "owner_business_unit_id": 10001,
         "viewers": [
@@ -21,8 +21,8 @@
         "hostname": "localhost",
         "port": 5432,
         "db_name": "db1",
-        "user_access": "user 1",
-        "created_at": "2024-01-01 00.00.00",
+        "table_owner": "user 1",
+        "created_at": "2024-01-01",
         "subscribed": true,
         "owner_business_unit_id": 10001,
         "viewers": [
@@ -36,8 +36,8 @@
         "hostname": "localhost",
         "port": 5432,
         "db_name": "db1",
-        "user_access": "user 1",
-        "created_at": "2024-01-01 00.00.00",
+        "table_owner": "user 1",
+        "created_at": "2024-01-01",
         "subscribed": true,
         "owner_business_unit_id": 10001,
         "viewers": [
@@ -51,8 +51,8 @@
         "hostname": "localhost",
         "port": 5432,
         "db_name": "db1",
-        "user_access": "user 1",
-        "created_at": "2024-01-01 00.00.00",
+        "table_owner": "user 1",
+        "created_at": "2024-01-01",
         "subscribed": true,
         "owner_business_unit_id": 10002,
         "viewers": [
@@ -67,6 +67,7 @@
         "engine": "MYSQL",
         "hostname": "localhost",
         "schema": "schema",
+        "table_owner": "user 1",
         "owner_business_unit_id": 10001,
         "viewers": [
             "1000331012"

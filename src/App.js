@@ -161,7 +161,7 @@ function App() {
             <Route path='/approval' element={<Approval />} />
             <Route path='/publish' element={<Publish />} />
             <Route path='/roles' element={<Roles />} />
-            <Route path='/access_graph' element={<GraphVisualization />} />
+            <Route path='/access_graph' element={<GraphVisualization userRole={userInfo.role} />} />
           </Routes>
       </section>
     </>

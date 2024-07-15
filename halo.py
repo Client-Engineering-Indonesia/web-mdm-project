@@ -333,6 +333,7 @@ def get_group_members(group_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Get Roles
 @app.route('/get_roles', methods=['GET'])
 def get_roles_and_permissions():
     try:
@@ -359,6 +360,7 @@ def get_roles_and_permissions():
                     role["doc"]["permissions"][i] = permission.replace('_', ' ').title()
                 
                 resultObject = {
+                    "role_id": role["id"],
                     "role_name": role["doc"]["role_name"],
                     "role_description": role["doc"]["description"],
                     "updated_at": datetime.fromtimestamp(role["doc"]["updated_at"]/1000).strftime('%Y-%m-%d'),
@@ -425,7 +427,6 @@ def login():
         user_id = user_info.get('uid')
         username = user_info.get('user_name')
         user_email = user_info.get('email')
-        role = user_info.get('role')
         groups = user_info.get('groups', [])
 
         # Find the first business unit name in groups
@@ -442,12 +443,30 @@ def login():
         if not username:
             return jsonify({'error': 'User info is incomplete'}), 400
 
+        role_headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {cp4d_token}'
+        }
+        get_all_roles_url = f'{cp4d_url}/usermgmt/v1/roles'
+        roles_response = requests.get(get_all_roles_url, headers=role_headers, verify=False)
+
+        if roles_response.status_code != 200:
+            return jsonify({'error': 'Failed to retrieve roles info', 'details': roles_response.text}), roles_response.status_code
+        elif roles_response.status_code == 200:
+            roles_response_json = roles_response.json()
+
+            # Assume a user only has one group role
+            for role in roles_response_json["rows"]:
+                if role["id"] == user_info["user_roles"][0]:
+                    user_role = role["doc"]["role_name"]
+
         # Create JWT token
         jwt_payload = {
             'uid': user_id,
             'username': username,
             'user_email': user_email,
-            'role': role,
+            'role': user_role,
             'business_unit_name': business_unit_name,
             'business_unit_id': business_unit_id,
             'cp4d_token': cp4d_token,
@@ -457,9 +476,11 @@ def login():
         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
 
         return jsonify({'jwt_token': jwt_token}), 200
+    
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+<<<<<<< HEAD
 @app.route('/add_new_role', methods=['POST'])
 def add_new_role():
     try:
@@ -546,6 +567,9 @@ def assign_role(username):
 
 
 
+=======
+# Get User Info
+>>>>>>> 010e55fa093595d61f4df33f4685ad9b1ced16d7
 @app.route('/user_info', methods=['POST'])
 def get_user_info_from_jwt():
     data = request.get_json()
@@ -559,6 +583,7 @@ def get_user_info_from_jwt():
 
     return jsonify({'user_info': decoded_token}), 200
 
+# Decode jwt token
 def decodeJwtToken(token):
     try:
         decoded_token = jwt.decode(token, secret, algorithms=['HS256'])
@@ -568,6 +593,7 @@ def decodeJwtToken(token):
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid token'}), 401
 
+# Get Groups
 @app.route('/get_groups', methods=['GET'])
 def get_groups():
     try:
@@ -646,6 +672,7 @@ def get_business_units_groups():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Get Catalogs
 @app.route('/get_catalogs', methods=['GET'])
 def get_catalogs():
     try:
@@ -716,21 +743,26 @@ def update_approval_status(id):
     try:
         new_status = request.json.get('status')
         current_time = datetime.now()
+        user_info = decodeJwtToken(request.json.get('webtoken'))
+        
+        if 'role' in user_info and 'admin' not in user_info["role"].lower():
+            return jsonify({'error': 'You do not have permission to approve this request'}), 400
+    
+        else: 
+            data = load_data()
+            updated = False
+            for entry in data:
+                if entry['id'] == id:
+                    entry['is_approved'] = new_status
+                    entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                    updated = True
+                    break
 
-        data = load_data()
-        updated = False
-        for entry in data:
-            if entry['id'] == id:
-                entry['is_approved'] = new_status
-                entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
-                updated = True
-                break
-
-        if updated:
-            save_data(data)
-            return jsonify({'message': f'Status updated for ID {id}'}), 200
-        else:
-            return jsonify({'error': f'ID {id} not found'}), 404
+            if updated:
+                save_data(data)
+                return jsonify({'message': f'Status updated for ID {id}'}), 200
+            else:
+                return jsonify({'error': f'ID {id} not found'}), 404
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -742,16 +774,18 @@ def create_request():
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
+        
+        user_info = decodeJwtToken(data.get('webtoken'))
 
         timestamp = current_timestamp()
         unique_id = str(uuid.uuid4())[:8]
 
         new_request = {
             "id": unique_id,
-            "is_approved": False,
-            "requestor_business_unit": data.get('business_unit'),
-            "requestor_username":  data.get('username'),
-            "requestor_role": data.get('role'),
+            "is_approved": True if 'admin' in user_info["role"].lower() else False,
+            "requestor_business_unit": user_info["business_unit_name"],
+            "requestor_username":  data.get('requestor_username'),
+            "requestor_role": data.get('requestor_role'),
             "table_name": data.get('table_name'),
             "owner_email": data.get('owner_email'),
             "owner_name": data.get('owner_name'),
@@ -786,7 +820,7 @@ def get_endpoint_data():
     try: 
         req_body = request.get_json()
 
-        user_info = decodeJwtToken(req_body.get('token'))
+        user_info = decodeJwtToken(req_body.get('webtoken'))
         internal_result = []
         external_result = []
 

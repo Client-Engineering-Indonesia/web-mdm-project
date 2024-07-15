@@ -1,12 +1,25 @@
 import React from 'react';
 import Graph2 from '../../data/graph.png';
-import { Grid } from '@carbon/react';
+import { Grid, Column } from '@carbon/react';
 
-function GraphVisualization() {
+function GraphVisualization({userRole}) {
     return <Grid>
+        {/* {userRole.toLowerCase().includes('admin') ?   */}
         <div style={{marginTop: 50}}>
             <img src={Graph2} alt="Graph" width={1500}/>
-        </div> 
+        </div>  
+        {/* :  */}
+        {/* <Column lg={16}>
+            <div style={{width: '100%'}}>You're not allowed to view this page.</div>
+        </Column>
+        } */}
+        {/* {userRole.toLowerCase().includes('admin') ?  <div style={{marginTop: 50}}>
+            <img src={Graph2} alt="Graph" width={1500}/>
+        </div>  : 
+        <Column lg={16}>
+            <div style={{width: '100%'}}>You're not allowed to view this page.</div>
+        </Column>
+        } */}
     </Grid>;
 }
 
