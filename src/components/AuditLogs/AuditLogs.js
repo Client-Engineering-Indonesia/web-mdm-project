@@ -14,13 +14,13 @@ import './AuditLogs.css';
 import fileData from './combined-dv-log-final.out';
 
 const headers = [
-    { key: 'Timestamp', header: 'Timestamp' , width: '175px'},
-    { key: 'Interface', header: 'Interface' , width: '300px'},
+    { key: 'Timestamp', header: 'Timestamp', width: '175px' },
+    { key: 'Interface', header: 'Interface', width: '300px' },
     { key: 'UserName', header: 'UserName', width: '75px' },
-    { key: 'UserGroup', header: 'UserGroup' , width: '75px'},
-    { key: 'Role', header: 'Role' , width: '75px'},
-    { key: 'Activity', header: 'Activity' , width: '150px'},
-    { key: 'Message', header: 'Message' , width: '700px'},
+    { key: 'UserGroup', header: 'UserGroup', width: '75px' },
+    { key: 'Role', header: 'Role', width: '75px' },
+    { key: 'Activity', header: 'Activity', width: '150px' },
+    { key: 'Message', header: 'Message', width: '700px' },
 ];
 
 const formatDate = (date) => {
@@ -34,13 +34,12 @@ const formatDate = (date) => {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
-function AuditLogs() {
+function AuditLogs({ userRole }) {
     const [searchInput, setSearchInput] = useState('');
     const [initData, setInitData] = useState([]);
     const [filteredRows, setFilteredRows] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-
 
     useEffect(() => {
         // Function to fetch and process the file content
@@ -48,8 +47,6 @@ function AuditLogs() {
             try {
                 const response = await fetch(fileData); // Fetch the imported file (can be replaced with Axios or other fetch methods)
                 const text = await response.text();
-
-                // console.log('text', text)
 
                 const parsedData = parseFileContent(text); // Assuming parseFileContent is correctly defined
                 setFilteredRows(parsedData);
@@ -61,7 +58,6 @@ function AuditLogs() {
 
         fetchLogFile();
     }, []);
-
 
     const parseFileContent = (logData) => {
         const logEntries = logData.split('\r\n');
@@ -120,63 +116,85 @@ function AuditLogs() {
     const endIndex = startIndex + rowsPerPage;
     const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
+    const isAdmin = userRole.toLowerCase().includes('admin');
+
     return (
-        <div className='auditlogs-content'>
+        <div style={{ padding: '20px' }}>
+            {isAdmin ? (
+                <div className='auditlogs-content'>
+                    <div className='options' style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <div className='title' style={{ fontSize: '24px', fontWeight: 'bold' }}>
+                            Activity Log
+                        </div>
+                        <div className='search'>
+                            <Search
+                                className='search-bar'
+                                size="lg"
+                                placeholder="Search"
+                                labelText="Search"
+                                closeButtonLabelText="Clear search input"
+                                id="search-1"
+                                value={searchInput}
+                                onChange={handleSearch}
+                                onKeyDown={handleSearch}
+                            />
+                        </div>
+                    </div>
 
+                    <DataTable rows={paginatedRows} headers={headers} style={{ width: '100%', overflowX: 'auto' }}>
+                        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+                            <Table {...getTableProps()} style={{ minWidth: '1000px' }}>
+                                <TableHead>
+                                    <TableRow>
+                                        {headers.map((header) => (
+                                            <TableHeader {...getHeaderProps({ header })} style={{ width: header.width, padding: '10px', backgroundColor: '#f4f4f4', borderBottom: '2px solid #dcdcdc' }}>
+                                                {header.header}
+                                            </TableHeader>
+                                        ))}
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {rows.map((row) => (
+                                        <TableRow {...getRowProps({ row })} style={{ borderBottom: '1px solid #dcdcdc' }}>
+                                            {row.cells.map((cell) => (
+                                                <TableCell key={cell.id} style={{ padding: '10px' }}>
+                                                    {cell.info.header === 'Timestamp' ? formatDate(new Date(cell.value)) : cell.value}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        )}
+                    </DataTable>
 
-            <div className='options'>
-                <div className='title'>
-                    Activity Log
-                </div>
-                <div className='search'>
-                    <Search
-                        className='search-bar'
-                        size="lg"
-                        placeholder="Search"
-                        labelText="Search"
-                        closeButtonLabelText="Clear search input"
-                        id="search-1"
-                        value={searchInput}
-                        onChange={handleSearch}
-                        onKeyDown={handleSearch}
+                    <Pagination
+                        totalItems={filteredRows.length}
+                        pageSize={rowsPerPage}
+                        pageSizes={[5, 10, 15, 20, 25]}
+                        onChange={({ page, pageSize }) => {
+                            handlePageChange(page);
+                            handleRowsPerPageChange({ target: { value: pageSize } });
+                        }}
+                        style={{ marginTop: '20px' }}
                     />
                 </div>
-            </div>
-
-            <DataTable rows={paginatedRows} headers={headers} style={{ width: '900px' }}>
-                {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()}>
-                        <TableHead>
-                            <TableRow>
-                                {headers.map((header) => (
-                                    <TableHeader {...getHeaderProps({ header })} style={{ width: header.width }}>
-                                        {header.header}
-                                    </TableHeader>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map((row) => (
-                                <TableRow {...getRowProps({ row })}>
-                                    {row.cells.map((cell) => (
-                                        <TableCell key={cell.id}>{cell.info.header === 'Timestamp' ? formatDate(new Date(cell.value)) : cell.value}</TableCell>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
-            </DataTable>
-
-            <Pagination
-                totalItems={filteredRows.length}
-                pageSize={rowsPerPage}
-                pageSizes={[5, 10, 15, 20, 25]}
-                onChange={({ page, pageSize }) => {
-                    handlePageChange(page);
-                    handleRowsPerPageChange({ target: { value: pageSize } });
-                }}
-            />
+            ) : (
+                <div style={{
+                    marginTop: 50,
+                    padding: 20,
+                    backgroundColor: '#ffdddd',
+                    borderRadius: 5,
+                    textAlign: 'center'
+                }}>
+                    <p style={{ fontSize: 18, fontWeight: 'bold', color: '#d8000c' }}>
+                        You're not allowed to view this page.
+                    </p>
+                    <p style={{ fontSize: 16 }}>
+                        You are a <span style={{ fontWeight: 'bold' }}>{userRole}</span>, only admins can view this page.
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

@@ -85,84 +85,84 @@ function App() {
           <p className='data-fabric'>DATA FABRIC</p>
         </div>
         <HeaderNavigation >
-          {isWebTokenPresent && 
-          <div className='profile'>
-            <div>
-              <p className='role'>{userInfo.business_unit_name} - {userInfo.role}</p>
-              <p className='name'>{userInfo.username}</p>
+          {isWebTokenPresent &&
+            <div className='profile'>
+              <div>
+                <p className='role'>{userInfo.business_unit_name} - {userInfo.role}</p>
+                <p className='name'>{userInfo.username}</p>
+              </div>
+              <Button size='lg' className='button' kind="secondary" onClick={handleLogout} >Logout</Button>
             </div>
-             <Button size='lg' className='button' kind="secondary" onClick={handleLogout} >Logout</Button>
-          </div>
           }
         </HeaderNavigation>
 
-        {isWebTokenPresent && 
-             <SideNav className='side-nav' aria-label="Side navigation" href="#main-content">
-             <SideNavItems>
-               <SideNavMenu title="User Management">
-                 <SideNavMenuItem href="/business_unit">
-                   Business Unit
-                 </SideNavMenuItem>
-                 <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                   User Group
-                 </SideNavMenuItem>
-                 <SideNavMenuItem href="/users">
-                   Users
-                 </SideNavMenuItem>
-                 <SideNavMenuItem href="/roles">
-                   Roles
-                 </SideNavMenuItem>
-               </SideNavMenu>
-               <SideNavMenu title="Repositories">
-                 <SideNavMenuItem href="/endpoint">
-                   Endpoint
-                 </SideNavMenuItem>
-                 <SideNavMenuItem href="/catalog">
-                   Catalog
-                 </SideNavMenuItem>
-               </SideNavMenu>
-               <SideNavMenu title="Exchange">
-                 <SideNavMenuItem href="/data_exchange">
-                   Data Exchange
-                 </SideNavMenuItem>
-                 <SideNavMenuItem href="/approval">
-                   Approval
-                 </SideNavMenuItem>
-                 {/* <SideNavMenuItem href="/publish">
+        {isWebTokenPresent &&
+          <SideNav className='side-nav' aria-label="Side navigation" href="#main-content">
+            <SideNavItems>
+              <SideNavMenu title="User Management">
+                <SideNavMenuItem href="/business_unit">
+                  Business Unit
+                </SideNavMenuItem>
+                <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                  User Group
+                </SideNavMenuItem>
+                <SideNavMenuItem href="/users">
+                  Users
+                </SideNavMenuItem>
+                <SideNavMenuItem href="/roles">
+                  Roles
+                </SideNavMenuItem>
+              </SideNavMenu>
+              <SideNavMenu title="Repositories">
+                <SideNavMenuItem href="/endpoint">
+                  Endpoint
+                </SideNavMenuItem>
+                <SideNavMenuItem href="/catalog">
+                  Catalog
+                </SideNavMenuItem>
+              </SideNavMenu>
+              <SideNavMenu title="Exchange">
+                <SideNavMenuItem href="/data_exchange">
+                  Data Exchange
+                </SideNavMenuItem>
+                <SideNavMenuItem href="/approval">
+                  Approval
+                </SideNavMenuItem>
+                {/* <SideNavMenuItem href="/publish">
                    Publish
                  </SideNavMenuItem> */}
-               </SideNavMenu>
-               <SideNavMenu title="Monitoring">
-                 <SideNavMenuItem href="/auditlogs">
-                   Audit and Logs
-                 </SideNavMenuItem>
-               </SideNavMenu>
-               <SideNavMenu title="Visualization">
-                 <SideNavMenuItem href="/access_graph">
-                   Access Graph
-                 </SideNavMenuItem>
-               </SideNavMenu>
-             </SideNavItems>
-           </SideNav>
-          }
-       
+              </SideNavMenu>
+              <SideNavMenu title="Monitoring">
+                <SideNavMenuItem href="/auditlogs">
+                  Audit and Logs
+                </SideNavMenuItem>
+              </SideNavMenu>
+              <SideNavMenu title="Visualization">
+                <SideNavMenuItem href="/access_graph">
+                  Access Graph
+                </SideNavMenuItem>
+              </SideNavMenu>
+            </SideNavItems>
+          </SideNav>
+        }
+
       </Header>
 
       <section className='content'>
         {/* routing below */}
-          <Routes>
-            <Route path="/data_exchange" element={<Data_Exchange />} />
-            <Route path='/users' element={<Users />} />
-            <Route path='/business_unit' element={<Business_Unit />} />
-            <Route path="/" element={<Login />} />
-            <Route path='/catalog' element={<Catalog />} />
-            <Route path='/endpoint' element={<Endpoint />} />
-            <Route path='/auditlogs' element={<AuditLogs />} />
-            <Route path='/approval' element={<Approval />} />
-            <Route path='/publish' element={<Publish />} />
-            <Route path='/roles' element={<Roles />} />
-            <Route path='/access_graph' element={<GraphVisualization userRole={userInfo.role} />} />
-          </Routes>
+        <Routes>
+          <Route path="/data_exchange" element={<Data_Exchange userRole={userInfo.role} />} />
+          <Route path='/users' element={<Users />} />
+          <Route path='/business_unit' element={<Business_Unit />} />
+          <Route path="/" element={<Login />} />
+          <Route path='/catalog' element={<Catalog />} />
+          <Route path='/endpoint' element={<Endpoint />} />
+          <Route path='/auditlogs' element={<AuditLogs userRole={userInfo.role} />} />
+          <Route path='/approval' element={<Approval />} />
+          <Route path='/publish' element={<Publish />} />
+          <Route path='/roles' element={<Roles />} />
+          <Route path='/access_graph' element={<GraphVisualization userRole={userInfo.role} />} />
+        </Routes>
       </section>
     </>
   );

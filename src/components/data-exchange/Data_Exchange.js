@@ -1,70 +1,45 @@
 import './Data_Exchange.css';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Search, Dropdown } from '@carbon/react';
-import axios from 'axios'; // Import Axios
-import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import DataExchangeRequestForm from './DataExchangeRequestForm';
 
 const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
 
-function Data_Exchange() {
+function Data_Exchange({ userRole }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [changeButton, setChangeButton] = useState(loadButtonState);
+
+    useEffect(() => {
+        Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 100000 });
+    }, [changeButton]);
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
     const items = [
-        {
-            id: 'option-0',
-            text: 'Business Unit 1',
-            tagId: '15'
-        },
-        {
-            id: 'option-1',
-            text: 'Business Unit 2',
-            tagId: '16'
-        },
+        { id: 'option-0', text: 'Business Unit 1', tagId: '15' },
+        { id: 'option-1', text: 'Business Unit 2', tagId: '16' },
     ];
+
     const arrayObject = [
-        {
-            table_name: 'BU_A_CUSTOMER',
-            business_name: 'Business Unit 1',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
-        },
-        {
-            table_name: 'BU_B_CUSTOMER',
-            business_name: 'Business Unit 2',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
-        },
-        {
-            table_name: 'BU_A_B_Joined',
-            business_name: 'Business Unit 3',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
-        },
-        {
-            table_name: 'CUSTOMER_TEST',
-            business_name: 'Business Unit 4',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
-        },
+        { table_name: 'BU_A_CUSTOMER', business_name: 'Business Unit 1', description: 'Data set of car sales from 2023 to 2024. cleansed and parsed' },
+        { table_name: 'BU_B_CUSTOMER', business_name: 'Business Unit 2', description: 'Data set of car sales from 2023 to 2024. cleansed and parsed' },
+        { table_name: 'BU_A_B_Joined', business_name: 'Business Unit 3', description: 'Data set of car sales from 2023 to 2024. cleansed and parsed' },
+        { table_name: 'CUSTOMER_TEST', business_name: 'Business Unit 4', description: 'Data set of car sales from 2023 to 2024. cleansed and parsed' },
     ];
-    // const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
-    // Load button state from cookies
-    const loadButtonState = () => {
+
+    function loadButtonState() {
         const savedState = Cookies.get('buttonState');
         return savedState ? JSON.parse(savedState) : Array(arrayObject.length).fill(false);
-    };
-
-    const [changeButton, setChangeButton] = useState(loadButtonState);
-    useEffect(() => {
-        // Save button state to cookies whenever it changes
-        Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 100000 });
-    }, [changeButton]);
+    }
 
     // const onClick = async (index) => {
     //     const getToken = async () => {
     //         try {
-    //             const response = await axios.post(`${url1}/get_token`);
+    //             const response = await axios.post(`${url}/get_token`);
     //             return response.data.token; // Adjust this according to your API response structure
     //         } catch (error) {
     //             console.error('Error fetching token:', error);
@@ -78,14 +53,14 @@ function Data_Exchange() {
     //     };
     //     try {
     //         if (changeButton[index] === false) {
-    //             const response = await axios.post(`${url1}/grant_access`, {
+    //             const response = await axios.post(`${url}/grant_access`, {
     //                 table_name: arrayObject[index].table_name,
     //             }, { headers });
     //             console.log('Request successful:', response);
     //         } else {
     //             const table_name = arrayObject[index].table_name;
     //             const table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM';
-    //             const response = await axios.delete(`${url1}/revoke_access/adi.wijaya@ibm.com`, {
+    //             const response = await axios.delete(`${url}/revoke_access/adi.wijaya@ibm.com`, {
     //                 headers: headers,
     //                 params: { table_name, table_schema }
     //             });
@@ -123,15 +98,15 @@ function Data_Exchange() {
                 <div className='product-catalog'>
                     <div className='title'>
                         <p className='product-catalog-title'>PRODUCT CATALOG</p>
-                        <Button size='md'>Request New Data Set</Button>
+                        <Button size='md' onClick={toggleSidebar}>Request New Data Set</Button>
                     </div>
                     <div className='title-content'>
-                        <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" onChange={() => { }} onKeyDown={() => { }} />
+                        <Search size="lg" placeholder="Search" labelText="Search" closeButtonLabelText="Clear search input" id="search-1" />
                         <div className='sort'>
                             <p>All Data Product (1000 Results)</p>
                             <p>Showing 1 of 50</p>
                             <div className='dropdown'>
-                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} />
+                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => (item ? item.text : '')} />
                             </div>
                         </div>
                     </div>
@@ -144,10 +119,16 @@ function Data_Exchange() {
                             <p>{item.table_name}</p>
                             <p>{item.business_name}</p>
                             <p>{item.description}</p>
-                            {changeButton[index] === false && <Button size='md' onClick={toggleSidebar} className='request-access'>Request Access</Button>}
-                            {changeButton[index] === true && <Button size='md'
-                                // onClick={() => onClick(index)} 
-                                className='request-access'>Revoke</Button>}
+                            {changeButton[index] === false && (
+                                <Button size='md' onClick={toggleSidebar} className='request-access' disabled={userRole === 'User'}>
+                                    Request Access
+                                </Button>
+                            )}
+                            {changeButton[index] === true && (
+                                <Button size='md' className='request-access' disabled={userRole === 'User'}>
+                                    Revoke
+                                </Button>
+                            )}
                         </div>
                     ))}
                 </div>
