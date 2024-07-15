@@ -17,7 +17,7 @@ import { jwtDecode } from 'jwt-decode'
 import axios from 'axios';
 
 const url = 'http://127.0.0.1:5000';
-// const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
 // 
 
 export default function ENDPOINT() {
@@ -52,14 +52,15 @@ export default function ENDPOINT() {
         };
 
         try{
-            const response = await axios.get(`${url}/get_endpoint_data`, {
-                // headers: {
-                //     'Content-Type': 'application/json',
-                // },
-                body: JSON.stringify(requestData),
-            });
+            const response = await fetch(`${url}/get_endpoint_data`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ webtoken: webToken }), // Send the token in the body
+              });
 
-            console.log('Response:', response.data.data);
+            console.log('Response:', response);
             setData(response.data.data);
         } catch (error) {
             console.error('Error:', error);

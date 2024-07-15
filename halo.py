@@ -843,7 +843,7 @@ def create_request():
 # Endpoint 
 endpoint_file_path = 'src/data/endpoint-data.json'
 
-@app.route('/get_endpoint_data', methods=['GET'])
+@app.route('/get_endpoint_data', methods=['POST'])
 def get_endpoint_data():
     try: 
         req_body = request.get_json()
@@ -870,6 +870,7 @@ def get_endpoint_data():
         }), 200
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
     
 @app.route('/create_new_endpoint', methods=['POST'])
