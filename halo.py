@@ -794,6 +794,61 @@ def update_approval_status(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/approve_request', methods=['POST'])
+def approve_request():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        request_id = data.get('id')
+        table_name = data.get('table_name')
+        authid = data.get('authid')
+        table_schema = data.get('table_schema')
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        payload = {
+            "table_name": table_name,
+            "table_schema": table_schema,
+            "authid": authid
+        }
+        access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+        if access_response.status_code == 200:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+            found = False
+            for item in data:
+                if item["id"] == request_id:
+                    item["is_approved"] = True
+                    item["approved_timestamp"] = current_timestamp()
+                    found = True
+
+            # Write the updated data back to the JSON file
+            with open(file_path, 'w') as file:
+                json.dump(data, file, indent=4)
+
+            if found:
+                return jsonify({"status": "Success", "data": data}), 200
+            else:
+                return jsonify({"status": "Failed", "message": "Request not found"}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
 @app.route('/create_request', methods=['POST'])
 def create_request():
