@@ -375,6 +375,39 @@ def get_roles_and_permissions():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Get Roles
+@app.route('/get_assignment_roles', methods=['GET'])
+def get_assignment_roles():
+    try:
+        user_info = decodeJwtToken(request.json.get('webtoken'))
+        url = f'{cp4d_url}/usermgmt/v1/roles'
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {user_info["cp4d_token"]}'
+        }
+        response = requests.get(url, headers=headers, verify=False)
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for role in responseJson["rows"]:
+                if ('wkc' not in role["id"].lower() and 'zen' not in role["id"].lower() and 'holding' not in role['doc']['role_name'].lower()):
+                    for i, permission in enumerate(role["doc"]["permissions"]):
+                        role["doc"]["permissions"][i] = permission.replace('_', ' ').title()
+                    resultObject = {
+                        "role_id": role["id"],
+                        "role_name": role["doc"]["role_name"],
+                        "role_description": role["doc"]["description"],
+                        "updated_at": datetime.fromtimestamp(role["doc"]["updated_at"]/1000).strftime('%Y-%m-%d'),
+                        "permissions": role["doc"]["permissions"]
+                    }
+                    resultList.append(resultObject)
+            return jsonify({"status": "Success", "data": resultList}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 # login
 @app.route('/login', methods=['POST'])
 def login():
@@ -477,6 +510,90 @@ def login():
 
         return jsonify({'jwt_token': jwt_token}), 200
     
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/add_new_role', methods=['POST'])
+def add_new_role():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        role_name = data.get('role_name')
+        description = data.get('description')
+        permission = data.get('permission')
+
+        # if not username or not user_roles:
+        #     return jsonify({'error': 'Missing required parameters'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/user/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        payload = {
+            'role_name': role_name,
+            'description': description,
+            'permission': permission
+        }
+
+        response = requests.put(url, headers=headers, json=payload, verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/assign_role/<username>', methods=['PUT'])
+def assign_role(username):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        username = data.get('username')
+        user_roles = data.get('user_roles')
+
+        if not username or not user_roles:
+            return jsonify({'error': 'Missing required parameters'}), 400
+
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+
+        token = auth_header.split(" ")[1]
+        url = f'{cp4d_url}/usermgmt/v1/user/{username}'
+
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+
+        payload = {
+            'username': username,
+            'user_roles': user_roles
+        }
+
+        response = requests.put(url, headers=headers, json=payload, verify=False)
+
+        if response.status_code == 200:
+            return jsonify({'message': 'ok'}), 200
+        else:
+            return jsonify({'error': 'failed', 'details': response.text}), response.status_code
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
