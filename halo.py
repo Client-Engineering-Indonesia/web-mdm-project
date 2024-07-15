@@ -480,7 +480,6 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-<<<<<<< HEAD
 @app.route('/add_new_role', methods=['POST'])
 def add_new_role():
     try:
@@ -567,9 +566,7 @@ def assign_role(username):
 
 
 
-=======
 # Get User Info
->>>>>>> 010e55fa093595d61f4df33f4685ad9b1ced16d7
 @app.route('/user_info', methods=['POST'])
 def get_user_info_from_jwt():
     data = request.get_json()
