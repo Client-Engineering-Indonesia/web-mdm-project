@@ -183,10 +183,10 @@ function USERS() {
                                 <input type="radio" name="role" value="Admin" /> Admin
                             </label>
                             <label>
-                                <input type="radio" name="role" value="Manager" /> Manager
+                                <input type="radio" name="role" value="Steward" /> Manager
                             </label>
                             <label>
-                                <input type="radio" name="role" value="Steward" /> Steward
+                                <input type="radio" name="role" value="User" /> Steward
                             </label>
                         </div>
                     </div>
