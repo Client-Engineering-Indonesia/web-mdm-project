@@ -3,20 +3,21 @@ import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
 import Cookies from 'js-cookie';
 
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+const url = 'http://127.0.0.1:5000';
 
 const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
     requestor_username: '',
     requestor_role: 'Viewer',
-    data_set_name: '',
+    data_set_name: '', // table name
     owner_email: '',
     owner_name: '',
     owner_phone: '',
     description: '',
     duration: '',
+    // table schema
   });
 
   const [errors, setErrors] = useState({});
@@ -63,6 +64,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         description: formData.description,
         duration: formData.duration,
         webtoken: webToken
+        // table schema
       };
 
       try {

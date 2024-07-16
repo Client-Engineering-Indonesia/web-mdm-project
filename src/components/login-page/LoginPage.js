@@ -2,10 +2,11 @@ import './LoginPage.css'
 import { React, useState, useEffect } from 'react';
 import {  Button, Form, TextInput, Stack } from '@carbon/react';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+const url = 'http://127.0.0.1:5000';
 
 
 export default function LOGIN () {
@@ -46,7 +47,16 @@ export default function LOGIN () {
             }
 
             const responseData = await response.json();
+
             Cookies.set('web_token', responseData.jwt_token, { expires: 7 });
+            if (responseData.jwt_token) {
+                // Decode the token
+                const decoded = jwtDecode(responseData.jwt_token);
+                // console.log(decoded)
+                Cookies.set('cp4d_token', decoded.cp4d_token, { expires: 7 });
+            }
+
+
             console.log('Response from server:', responseData);
             window.location.replace('/business_unit');
         } catch (error) {
