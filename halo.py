@@ -564,17 +564,13 @@ def assign_role(username):
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        username = data.get('username')
         user_roles = data.get('user_roles')
 
         if not username or not user_roles:
             return jsonify({'error': 'Missing required parameters'}), 400
 
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({'error': 'Authorization header missing'}), 401
-
-        token = auth_header.split(" ")[1]
+        user_info = decodeJwtToken(data.get('web_token'))
+        token = user_info["cp4d_token"]
         url = f'{cp4d_url}/usermgmt/v1/user/{username}'
 
         headers = {
@@ -590,7 +586,7 @@ def assign_role(username):
         response = requests.put(url, headers=headers, json=payload, verify=False)
 
         if response.status_code == 200:
-            return jsonify({'message': response}), 200
+            return jsonify({'message': response.json()}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -1000,10 +996,11 @@ def graph_main(start_date, end_date):
         for node in G.nodes():
             x, y = nodes_positions[node]
             node_data = {"key":node}
-            node_data["loc"] = f"{x} {y}"
             if node in VIRTUALIZED_DATA:
                 node_data['text'] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
+                node_data['type'] = "database"
             else:
+                node_data["type"] = "user"
                 node_data['text'] = node
             node_data_array.append(node_data)
         # Get node edge array
