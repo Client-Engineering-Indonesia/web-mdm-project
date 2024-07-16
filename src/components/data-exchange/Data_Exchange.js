@@ -28,23 +28,38 @@ function Data_Exchange() {
     ];
     const arrayObject = [
         {
-            table_name: 'BU_A_CUSTOMER',
+            table_name: 'AUDIT',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 1',
+            request_timestamp: 'Jul 4, 2024 3:27 PM',
             description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
         {
-            table_name: 'BU_B_CUSTOMER',
+            table_name: 'MORTGAGE_CANDIDATE',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 2',
+            request_timestamp: 'Jul 4, 2024 3:27 PM',
             description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
         {
-            table_name: 'BU_A_B_Joined',
+            table_name: 'EMPLOYEE_RECORDS',
+            table_schema: 'CPADMIN',
             business_name: 'Business Unit 3',
+            request_timestamp: 'Jul 1, 2024 2:03 PM',
             description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
         {
             table_name: 'CUSTOMER_TEST',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 4',
+            request_timestamp:'Jun 29, 2024 10:51 PM',
+            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
+        {
+            table_name: 'EMPLOYEE',
+            table_schema: 'CPADMIN',
+            business_name: 'Business Unit 4',
+            request_timestamp:'Jun 28, 2024 1:38 PM',
             description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
     ];
@@ -141,9 +156,11 @@ function Data_Exchange() {
                 <div className='request-list'>
                     {arrayObject.map((item, index) => (
                         <div key={index} className='list-detail'>
-                            <p>{item.table_name}</p>
-                            <p>{item.business_name}</p>
-                            <p>{item.description}</p>
+                            <p>Table Name: {item.table_name}</p>
+                            <p>Table Schema: {item.table_schema}</p>
+                            <p>Business Name: {item.business_name}</p>
+                            <p>Created Date: {item.request_timestamp}</p>
+                            <p>Description: {item.description}</p>
                             {changeButton[index] === false && <Button size='md' onClick={toggleSidebar} className='request-access'>Request Access</Button>}
                             {changeButton[index] === true && <Button size='md'
                                 // onClick={() => onClick(index)} 
