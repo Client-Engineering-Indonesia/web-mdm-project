@@ -102,9 +102,9 @@ function App() {
                  <SideNavMenuItem href="/business_unit">
                    Business Unit
                  </SideNavMenuItem>
-                 <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                 {/* <SideNavMenuItem href="https://www.carbondesignsystem.com/">
                    User Group
-                 </SideNavMenuItem>
+                 </SideNavMenuItem> */}
                  <SideNavMenuItem href="/users">
                    Users
                  </SideNavMenuItem>

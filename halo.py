@@ -590,7 +590,7 @@ def assign_role(username):
         response = requests.put(url, headers=headers, json=payload, verify=False)
 
         if response.status_code == 200:
-            return jsonify({'message': 'ok'}), 200
+            return jsonify({'message': response}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -785,7 +785,37 @@ def update_approval_status(id):
                     entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
                     updated = True
                     break
+            
+            request_id = request.json.get(id)
+            table_name = request.json.get('table_name')
+            authid = user_info["username"]
+            table_schema = request.json.get('table_schema')
 
+            token = user_info.get('cp4d_token')
+            url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
+
+            headers = {
+                'content-type': 'application/json',
+                'Authorization': f'Bearer {token}'
+            }
+            payload = {
+                "table_name": table_name,
+                "table_schema": table_schema,
+                "authid": authid
+            }
+            access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+            if access_response.status_code == 200:
+                with open(file_path, 'r') as file:
+                    data = json.load(file)
+
+                found = False
+                for item in data:
+                    if item["id"] == request_id:
+                        item["is_approved"] = True
+                        item["approved_timestamp"] = current_timestamp()
+                        found = True
+                        
             if updated:
                 save_data(data)
                 return jsonify({'message': f'Status updated for ID {id}'}), 200
@@ -808,6 +838,10 @@ def create_request():
         timestamp = current_timestamp()
         unique_id = str(uuid.uuid4())[:8]
 
+        duration = int(data.get('duration'))
+        expire_timestamp = datetime.now() + timedelta(days=duration)
+        formatted_expire_timestamp = expire_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
         new_request = {
             "id": unique_id,
             "is_approved": True if 'admin' in user_info["role"].lower() else False,
@@ -821,7 +855,7 @@ def create_request():
             "description": data.get('description'),
             "request_timestamp": timestamp,
             "approved_timestamp": None,
-            "expire_date": data.get('duration')
+            "expire_date": formatted_expire_timestamp
         }
 
         json_path = file_path
