@@ -853,6 +853,7 @@ def create_request():
             "owner_name": data.get('owner_name'),
             "owner_phone": data.get('owner_phone'),
             "description": data.get('description'),
+            "table_schema": data.get('table_schema'),
             "request_timestamp": timestamp,
             "approved_timestamp": None,
             "expire_date": formatted_expire_timestamp
