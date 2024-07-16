@@ -58,6 +58,11 @@ const userGroups = [
     { id: '2', text: 'MGR-GRP' },
 ];
 
+const userRoles = [
+    { id: '6b7565ce-1b88-406c-a6c0-b8a648212cdd', text: 'Business Unit User' },
+    { id: 'f63304ee-7d58-4bd0-844e-6ecb307e1975', text: 'Business Unit Steward' },
+    { id: '3757020c-d282-4706-a96f-a5255048b46c', text: 'Admin Business Unit' }
+]
 function USERS() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedBusinessUnit, setSelectedBusinessUnit] = useState(null);
@@ -165,34 +170,20 @@ function USERS() {
                         itemToString={item => (item ? item.text : '')}
                         onChange={({ selectedItem }) => setSelectedBusinessUnit(selectedItem)}
                         placeholder="Select Business Unit"
-                        style={{ marginBottom: '1rem' }}
-                    />
-                    <Dropdown
-                        id="userGroup"
-                        label="User Group"
-                        items={userGroups}
-                        itemToString={item => (item ? item.text : '')}
-                        onChange={({ selectedItem }) => setSelectedUserGroup(selectedItem)}
-                        placeholder="Select User Group"
-                        style={{ marginBottom: '1rem' }}
-
+                        style={{ marginBottom: '1.5rem' }}
                     />
                     <TextInput id="userName" labelText="User Name" placeholder="Enter User Name" className='input-text' />
-                    <TextInput id="email" labelText="Email" placeholder="Enter Email" className='input-text' />
-                    <div>
-                        <label>Role:</label>
-                        <div className='radio-container'>
-                            <label>
-                                <input type="radio" name="role" value="Admin" /> Admin
-                            </label>
-                            <label>
-                                <input type="radio" name="role" value="Steward" /> Manager
-                            </label>
-                            <label>
-                                <input type="radio" name="role" value="User" /> Steward
-                            </label>
-                        </div>
-                    </div>
+
+                    <Dropdown
+                        id="userRoles"
+                        label="User Roles"
+                        items={userRoles}
+                        itemToString={item => (item ? item.text : '')}
+                        onChange={({ selectedItem }) => setSelectedUserGroup(selectedItem)}
+                        placeholder="Select User Roles"
+                        style={{ margin: '1rem 0rem' }}
+
+                    />
                     <div className='button-container'>
                         <Button kind="primary" onClick={() => { }} style={{ width: '50%' }}>Submit</Button>
                         <Button kind="secondary" onClick={toggleSidebar} style={{ width: '50%' }}>Cancel</Button>

@@ -560,21 +560,20 @@ def add_new_role():
 def assign_role(username):
     try:
         data = request.get_json()
-
+        print(data)
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        username = data.get('username')
         user_roles = data.get('user_roles')
 
         if not username or not user_roles:
             return jsonify({'error': 'Missing required parameters'}), 400
 
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return jsonify({'error': 'Authorization header missing'}), 401
-
-        token = auth_header.split(" ")[1]
+        # auth_header = request.headers.get('Authorization')
+        # if not auth_header:
+        #     return jsonify({'error': 'Authorization header missing'}), 401
+        user_info = decodeJwtToken(data.get("web_token"))
+        token = user_info["cp4d_token"]
         url = f'{cp4d_url}/usermgmt/v1/user/{username}'
 
         headers = {
