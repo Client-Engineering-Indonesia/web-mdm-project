@@ -8,6 +8,7 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install
 RUN npm install js-cookie
+RUN npm install jwt-decode
 
 # Copy the rest of the application and build the React app
 COPY ./ ./

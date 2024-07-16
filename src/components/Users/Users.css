@@ -18,6 +18,11 @@
   margin-left: 15px;
 }
 
+.title p {
+  font-size: 32px;
+  font-weight: bold;
+}
+
 .menus p {
   font-weight: 500;
   display: flex;

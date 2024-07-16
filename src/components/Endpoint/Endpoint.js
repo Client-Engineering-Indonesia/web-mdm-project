@@ -1,5 +1,5 @@
 import './Endpoint.css'
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import {
     DataTable,
     Table,
@@ -12,125 +12,132 @@ import {
 } from '@carbon/react';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Add, CopyFile, TrashCan, Edit, Power } from '@carbon/icons-react';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'
+import axios from 'axios';
 
-
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
-
+const url = 'http://127.0.0.1:5000';
+// const url = 'http://127.0.0.1:5000';
+// 
 
 export default function ENDPOINT() {
 
     
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
 
     const toggleModal = () => {
         setIsModalOpen(prevState => !prevState);
     };
+
+    const [internalData, setInternalData] = useState([]);
+    const [externalData, setExternalData] = useState([]);
+    const [loading, setLoading] = useState(true); // Loading state
+    const [error, setError] = useState(null); // Error state
+
+    useEffect(() => {
+        console.log('Token in useEffect:', isToken);
+    }, [isToken]); // This will run whenever isToken changes
+
+    useEffect(() => {
+        // If you need to update the token dynamically, you can still do so here
+        const token = Cookies.get('web_token');
+        setIsToken(token || '');
+        fetchData();
+    }, []); // This runs once on component mount
+
+    // const fetchData = async () => {
+    //     const webToken= Cookies.get('web_token');
+    //     const requestData= {
+    //         webtoken: webToken
+    //     };
+    //     try{
+    //         const response = await fetch(`${url}/get_endpoint_data`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //               },
+    //               body: JSON.stringify({ webtoken: webToken }), // Send the token in the body
+    //         });
+    //         console.log(response);
+
+    //         const responseData = await JSON.stringify(response);
+    //         console.log('Response:', responseData);
+    //         setData(responseData);
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+    // };
+
+    const fetchData= async() => {
+        try {
+            const token= isToken;
+            const requestData={
+                webtoken: token
+            };
+
+            const response= await axios.post(`${url}/get_endpoint_data`, requestData, {
+                headers: {
+                    'Content-Type': 'application/json', 
+                }
+            });
+            console.log(response);
+            console.log(response.data.result.internal);
+            console.log(response.data.result.external);
+            setInternalData(response.data.result.internal);
+            setExternalData(response.data.result.external);
+            setLoading(false);
+        }catch(error){
+            console.error('Error:', error);
+        }
+    }
+
 
     const submithandler = () => {
         console.log('submit');
         setIsModalOpen(false);
     };
 
-    const headers = [
+    const columns = [
         {
-            key: 'EndpointName',
+            key: 'endpoint_name',
             header: 'Endpoint Name',
         },
         {
-            key: 'Status',
+            key: 'status',
             header: 'Status',
         },
         {
-            key: 'Engine',
+            key: 'engine',
             header: 'Engine',
         },
         {
-            key: 'Hostname',
+            key: 'hostname',
             header: 'Hostname',
         },
         {
-            key: 'Port',
+            key: 'port',
             header: 'Port',
         },
         {
-            key: 'DatabaseName',
+            key: 'db_name',
             header: 'Database Name',
         },
         {
-            key: 'UserAcess',
-            header: 'User Access',
+            key: 'table_owner',
+            header: 'Table Owner',
         },
         {
-            key: 'CreatedAt',
+            key: 'created_at',
             header: 'Created At',
         },
         {
-            key: 'Subscribed',
-            header: 'Subscribed',
-        }
-    ];
-
-    const rows = [
-        {
-            id: 'a',
-            EndpointName: 'Endpoint 1',
-            Status: 'Active',
-            Engine: 'Postgres',
-            Hostname: 'localhost',
-            Port: '5432',
-            DatabaseName: 'db1',
-            UserAcess: 'user1',
-            CreatedAt: '2021-07-01',
-            Subscribed: 'TRUE'
+            key: 'owner_business_unit_id',
+            header: 'Owner BU ID',
         },
         {
-            id: 'b',
-            EndpointName: 'Endpoint 2',
-            Status: 'Active',
-            Engine: 'Postgres',
-            Hostname: 'localhost',
-            Port: '5432',
-            DatabaseName: 'db2',
-            UserAcess: 'user2',
-            CreatedAt: '2021-07-02',
-            Subscribed: 'TRUE'
-        },
-        {
-            id: 'c',
-            EndpointName: 'Endpoint 3',
-            Status: 'Active',
-            Engine: 'Postgres',
-            Hostname: 'localhost',
-            Port: '5432',
-            DatabaseName: 'db3',
-            UserAcess: 'user3',
-            CreatedAt: '2021-07-03',
-            Subscribed: 'TRUE'
-        },
-        {
-            id: 'd',
-            EndpointName: 'Endpoint 4',
-            Status: 'Active',
-            Engine: 'Postgres',
-            Hostname: 'localhost',
-            Port: '5432',
-            DatabaseName: 'db4',
-            UserAcess: 'user4',
-            CreatedAt: '2021-07-04',
-            Subscribed: 'TRUE'
-        },
-        {
-            id: 'e',
-            EndpointName: 'Endpoint 5',
-            Status: 'Active',
-            Engine: 'Postgres',
-            Hostname: 'localhost',
-            Port: '5432',
-            DatabaseName: 'db5',
-            UserAcess: 'user5',
-            CreatedAt: '2021-07-05',
-            Subscribed: 'TRUE'
+            key: 'viewers',
+            header: 'Viewers',
         },
     ];
 
@@ -144,10 +151,10 @@ export default function ENDPOINT() {
                         <Tab>Internal</Tab>
                         <Tab>External</Tab>
                     </TabList>
-                </Tabs>
-            </div>
 
-            <div className='endpoint-content'>
+                    <TabPanels>
+                        <TabPanel>
+                        <div className='endpoint-content'>
                 <div className='options'>
                     <div className='menus'>
                         <div className='menu-name-images'>
@@ -184,30 +191,36 @@ export default function ENDPOINT() {
                 </div>
 
                 <div className='endpoint-tables'>
-                    <DataTable rows={rows} headers={headers}>
-                        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()}>
-                                <TableHead>
-                                    <TableRow>
-                                        {headers.map((header) => (
-                                            <TableHeader {...getHeaderProps({ header })}>
-                                                {header.header}
-                                            </TableHeader>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {rows.map((row) => (
-                                        <TableRow {...getRowProps({ row })}>
-                                            {row.cells.map((cell) => (
-                                                <TableCell key={cell.id}>{cell.value}</TableCell>
-                                            ))}
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        )}
-                    </DataTable>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((header) => (
+                                    <TableHeader key={header.key} style={{ width: 400 }}>
+                                        {header.header}
+                                    </TableHeader>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.isArray(internalData) && internalData.map((row, i) => (
+                                <TableRow
+                                    key={row.id}
+                                >
+                                    <TableCell>{row.endpoint_name}</TableCell>
+                                    <TableCell>{row.status}</TableCell>
+                                    <TableCell>{row.engine}</TableCell>
+                                    <TableCell>{row.hostname}</TableCell>
+                                    <TableCell>{row.port}</TableCell>
+                                    <TableCell>{row.db_name}</TableCell>
+                                    <TableCell>{row.table_owner}</TableCell>
+                                    <TableCell>{row.created_at}</TableCell>
+                                    <TableCell>{row.owner_business_unit_id}</TableCell>
+                                    <TableCell>{row.viewers}</TableCell>
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                     <Pagination
                         backwardText="Previous page"
                         forwardText="Next page"
@@ -227,6 +240,101 @@ export default function ENDPOINT() {
                     />
                 </div>
             </div>
+                        </TabPanel>
+
+                        <TabPanel>
+                        <div className='endpoint-content'>
+                <div className='options'>
+                    <div className='menus'>
+                        <div className='menu-name-images'>
+                            <IconButton label="add" kind='primary' onClick={toggleModal}>
+                                <Add className='button-add' />
+                            </IconButton>
+                            <p>Add</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="duplicate" kind='secondary'>
+                                <CopyFile className='button-duplicate' />
+                            </IconButton>
+                            <p>Duplicate</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="edit" kind='secondary'>
+                                <Edit className='button-edit' />
+                            </IconButton>
+                            <p>Edit</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="delete" kind='secondary'>
+                                <TrashCan className='button-delete' />
+                            </IconButton>
+                            <p>Delete</p>
+                        </div>
+                        <div className='menu-name-images'>
+                            <IconButton label="activate" kind='secondary'>
+                                <Power className='button-activate' />
+                            </IconButton>
+                            <p>Activate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='endpoint-tables'>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((header) => (
+                                    <TableHeader key={header.key} style={{ width: 400 }}>
+                                        {header.header}
+                                    </TableHeader>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Array.isArray(externalData) && externalData.map((row, i) => (
+                                <TableRow
+                                    key={row.id}
+                                >
+                                    <TableCell>{row.endpoint_name}</TableCell>
+                                    <TableCell>{row.status}</TableCell>
+                                    <TableCell>{row.engine}</TableCell>
+                                    <TableCell>{row.hostname}</TableCell>
+                                    <TableCell>{row.port}</TableCell>
+                                    <TableCell>{row.db_name}</TableCell>
+                                    <TableCell>{row.table_owner}</TableCell>
+                                    <TableCell>{row.created_at}</TableCell>
+                                    <TableCell>{row.owner_business_unit_id}</TableCell>
+                                    <TableCell>{row.viewers}</TableCell>
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <Pagination
+                        backwardText="Previous page"
+                        forwardText="Next page"
+                        itemsPerPageText="Items per page:"
+                        onChange={function noRefCheck() { }}
+                        page={1}
+                        pageSize={10}
+                        pageSizes={[
+                            10,
+                            20,
+                            30,
+                            40,
+                            50
+                        ]}
+                        size="md"
+                        totalItems={103}
+                    />
+                </div>
+            </div>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+            </div>
+
+            
 
             <div className='modal'>
                 <Modal
