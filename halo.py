@@ -376,6 +376,131 @@ def get_roles_and_permissions():
         return jsonify({'error': str(e)}), 500
 
 # login
+# @app.route('/login', methods=['POST'])
+# def login():
+#     try:
+#         data = request.get_json()
+
+#         if not data:
+#             return jsonify({'error': 'No data provided'}), 400
+
+#         username = data.get('username')
+#         password = data.get('password')
+
+#         if not username or not password:
+#             return jsonify({'error': 'Missing required parameters'}), 400
+
+#         headers = {
+#             'content-type': 'application/json'
+#         }
+
+#         payload = {
+#             "username": username,
+#             "password": password
+#         }
+
+#         # Get CP4D token
+#         auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=payload)
+
+#         if auth_response.status_code != 200:
+#             return jsonify({'error': 'Authentication failed', 'details': auth_response.text}), auth_response.status_code
+
+#         cp4d_token = auth_response.json().get('token')
+
+#         if not cp4d_token:
+#             return jsonify({'error': 'Failed to retrieve CP4D token'}), 400
+
+#         # Use CP4D token to get user info
+#         user_info_headers = {
+#             'content-type': 'application/json',
+#             'Authorization': f'Bearer {cp4d_token}'
+#         }
+
+#         user_info_response = requests.get(f'{cp4d_url}/usermgmt/v1/user/currentUserInfo', headers=user_info_headers)
+
+#         if user_info_response.status_code != 200:
+#             return jsonify({'error': 'Failed to retrieve user info', 'details': user_info_response.text}), user_info_response.status_code
+
+#         user_info = user_info_response.json()
+
+#         # Assuming user_info contains username, email, and business unit group
+#         user_id = user_info.get('uid')
+#         username = user_info.get('user_name')
+#         user_email = user_info.get('email')
+#         groups = user_info.get('groups', [])
+
+#         # Find the first business unit name in groups
+#         business_unit_name = None
+#         business_unit_id = None
+
+#         for group in groups:
+#             name = group.get('name')
+#             if name and 'business' in name.lower():  # Check if 'business' is in the name
+#                 business_unit_name = name
+#                 business_unit_id = group.get('group_id')
+#                 break  # Stop after finding the first match
+
+#         if not username:
+#             return jsonify({'error': 'User info is incomplete'}), 400
+
+#         role_headers = {
+#             'cache-control': 'no-cache',
+#             'content-type': 'application/json',
+#             'Authorization': f'Bearer {cp4d_token}'
+#         }
+#         get_all_roles_url = f'{cp4d_url}/usermgmt/v1/roles'
+#         roles_response = requests.get(get_all_roles_url, headers=role_headers, verify=False)
+
+#         if roles_response.status_code != 200:
+#             return jsonify({'error': 'Failed to retrieve roles info', 'details': roles_response.text}), roles_response.status_code
+#         elif roles_response.status_code == 200:
+#             roles_response_json = roles_response.json()
+
+#             # Assume a user only has one group role
+#             for role in roles_response_json["rows"]:
+#                 if role["id"] == user_info["user_roles"][0]:
+#                     user_role = role["doc"]["role_name"]
+
+#         # Create JWT token
+#         jwt_payload = {
+#             'uid': user_id,
+#             'username': username,
+#             'user_email': user_email,
+#             'role': user_role,
+#             'business_unit_name': business_unit_name,
+#             'business_unit_id': business_unit_id,
+#             'cp4d_token': cp4d_token,
+#             'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
+#         }
+
+#         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
+
+#         return jsonify({'jwt_token': jwt_token}), 200
+    
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
+
+dummy_users = {
+    'webuser_A': {
+        'user_id': '1',
+        'username': 'webuser_A',
+        'user_email': 'webusera@mail.com',
+        'business_unit_name': 'Business Unit A',
+        'business_unit_id': 'BU_A',
+        'role': 'Business Unit User',
+        'cp4d_token': 'dummy_token_A'
+    },
+    'webuser_B': {
+        'user_id': '2',
+        'username': 'webuser_B',
+        'user_email': 'webuserb@mail.com',
+        'business_unit_name': 'Business Unit B',
+        'business_unit_id': 'BU_B',
+        'role': 'Business Unit User',
+        'cp4d_token': 'dummy_token_B'
+    }
+}
+
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -390,6 +515,26 @@ def login():
         if not username or not password:
             return jsonify({'error': 'Missing required parameters'}), 400
 
+        # Check if the user is a dummy user
+        if username in dummy_users:
+            user_info = dummy_users[username]
+
+            jwt_payload = {
+                'uid': user_info['user_id'],
+                'username': user_info['username'],
+                'user_email': user_info['user_email'],
+                'role': user_info['role'],
+                'business_unit_name': user_info['business_unit_name'],
+                'business_unit_id': user_info['business_unit_id'],
+                'cp4d_token': user_info['cp4d_token'],
+                'exp': datetime.utcnow() + timedelta(hours=5)  # Token expiration time
+            }
+
+            jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
+
+            return jsonify({'jwt_token': jwt_token}), 200
+
+        # If not a dummy user, proceed with CP4D authentication
         headers = {
             'content-type': 'application/json'
         }
@@ -470,13 +615,13 @@ def login():
             'business_unit_name': business_unit_name,
             'business_unit_id': business_unit_id,
             'cp4d_token': cp4d_token,
-            'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
+            'exp': datetime.utcnow() + timedelta(hours=5)  # Token expiration time
         }
 
         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
 
         return jsonify({'jwt_token': jwt_token}), 200
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
