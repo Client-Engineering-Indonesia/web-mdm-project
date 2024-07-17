@@ -796,17 +796,20 @@ def save_data(data):
 @app.route('/get_assets', methods=['GET'])
 def get_assets_data():
     try: 
+        # print('halo')
         auth_header = request.headers.get('Authorization')
         if not auth_header:
             return jsonify({'error': 'Authorization header missing'}), 401
         webtoken = auth_header.split(" ")[1]
+        # print(webtoken)
         logged_in_user = decodeJwtToken(webtoken)
-        
+        print(logged_in_user)
         table_assets_path = 'src/data/table-assets.json'
         dv_list = []
 
         # Check if the user is a dummy user
         if logged_in_user['username'] in dummy_users:
+            # print("halo")
             with open(table_assets_path, 'r') as file:
                 dv_list = json.load(file)["objects"]
 
