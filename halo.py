@@ -1111,6 +1111,31 @@ def graph_main(start_date, end_date):
             else:
                 node_data["type"] = "user"
                 node_data['text'] = node
+            
+            if node == 'CPADMIN':
+                node_data['loc'] = '-100 300'
+            elif node == 'BU_A_CUSTOMER':
+                node_data['loc'] = '50 300'
+            elif node == 'HIZKIA.FEBIANTO@IBM.COM':
+                node_data['loc'] = '50 0'
+            elif node == 'ADI.WIJAYA@IBM.COM':
+                node_data['loc'] = "50 460"
+            elif node == 'ACHMAD.FAUZAN@IBM.COM':
+                node_data['loc'] = "250 300"
+            elif node == 'DANENDRA.ATHALLARIQ@IBM.COM':
+                node_data['loc'] = "780 300"
+            elif node == 'BU_A_B_Joined':
+                node_data['loc'] = "780 0"
+            elif node == 'BU_B_CUSTOMER':
+                node_data['loc'] = "500 460"
+            elif node == 'EMPLOYEE':
+                node_data['loc'] = "480 100"
+            elif node == 'HIZKIA_FEB':
+                node_data['loc'] = "280 150"
+            elif node == 'EMPLOYEE_RECORDS':
+                node_data['loc'] = "480 300"
+
+
             node_data_array.append(node_data)
         # Get node edge array
         for i, edge in enumerate(G.edges()):
