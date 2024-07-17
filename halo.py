@@ -58,7 +58,6 @@ def grant_access():
     try:
         data = request.get_json()
     
-
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
@@ -407,111 +406,6 @@ def get_assignment_roles():
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-# login
-# @app.route('/login', methods=['POST'])
-# def login():
-#     try:
-#         data = request.get_json()
-
-#         if not data:
-#             return jsonify({'error': 'No data provided'}), 400
-
-#         username = data.get('username')
-#         password = data.get('password')
-
-#         if not username or not password:
-#             return jsonify({'error': 'Missing required parameters'}), 400
-
-#         headers = {
-#             'content-type': 'application/json'
-#         }
-
-#         payload = {
-#             "username": username,
-#             "password": password
-#         }
-
-#         # Get CP4D token
-#         auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=payload)
-
-#         if auth_response.status_code != 200:
-#             return jsonify({'error': 'Authentication failed', 'details': auth_response.text}), auth_response.status_code
-
-#         cp4d_token = auth_response.json().get('token')
-
-#         if not cp4d_token:
-#             return jsonify({'error': 'Failed to retrieve CP4D token'}), 400
-
-#         # Use CP4D token to get user info
-#         user_info_headers = {
-#             'content-type': 'application/json',
-#             'Authorization': f'Bearer {cp4d_token}'
-#         }
-
-#         user_info_response = requests.get(f'{cp4d_url}/usermgmt/v1/user/currentUserInfo', headers=user_info_headers)
-
-#         if user_info_response.status_code != 200:
-#             return jsonify({'error': 'Failed to retrieve user info', 'details': user_info_response.text}), user_info_response.status_code
-
-#         user_info = user_info_response.json()
-
-#         # Assuming user_info contains username, email, and business unit group
-#         user_id = user_info.get('uid')
-#         username = user_info.get('user_name')
-#         user_email = user_info.get('email')
-#         groups = user_info.get('groups', [])
-
-#         # Find the first business unit name in groups
-#         business_unit_name = None
-#         business_unit_id = None
-
-#         for group in groups:
-#             name = group.get('name')
-#             if name and 'business' in name.lower():  # Check if 'business' is in the name
-#                 business_unit_name = name
-#                 business_unit_id = group.get('group_id')
-#                 break  # Stop after finding the first match
-
-#         if not username:
-#             return jsonify({'error': 'User info is incomplete'}), 400
-
-#         role_headers = {
-#             'cache-control': 'no-cache',
-#             'content-type': 'application/json',
-#             'Authorization': f'Bearer {cp4d_token}'
-#         }
-#         get_all_roles_url = f'{cp4d_url}/usermgmt/v1/roles'
-#         roles_response = requests.get(get_all_roles_url, headers=role_headers, verify=False)
-
-#         if roles_response.status_code != 200:
-#             return jsonify({'error': 'Failed to retrieve roles info', 'details': roles_response.text}), roles_response.status_code
-#         elif roles_response.status_code == 200:
-#             roles_response_json = roles_response.json()
-
-#             # Assume a user only has one group role
-#             for role in roles_response_json["rows"]:
-#                 if role["id"] == user_info["user_roles"][0]:
-#                     user_role = role["doc"]["role_name"]
-
-#         # Create JWT token
-#         jwt_payload = {
-#             'uid': user_id,
-#             'username': username,
-#             'user_email': user_email,
-#             'role': user_role,
-#             'business_unit_name': business_unit_name,
-#             'business_unit_id': business_unit_id,
-#             'cp4d_token': cp4d_token,
-#             'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
-#         }
-
-#         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
-
-#         return jsonify({'jwt_token': jwt_token}), 200
-    
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
 
 dummy_users = {
     'webuser_A': {
@@ -519,7 +413,7 @@ dummy_users = {
         'username': 'webuser_A',
         'user_email': 'webusera@mail.com',
         'business_unit_name': 'Business Unit A',
-        'business_unit_id': 'BU_A',
+        'business_unit_id': '10001',
         'role': 'Business Unit User',
         'cp4d_token': 'dummy_token_A'
     },
@@ -528,7 +422,7 @@ dummy_users = {
         'username': 'webuser_B',
         'user_email': 'webuserb@mail.com',
         'business_unit_name': 'Business Unit B',
-        'business_unit_id': 'BU_B',
+        'business_unit_id': '10002',
         'role': 'Business Unit User',
         'cp4d_token': 'dummy_token_B'
     }
@@ -657,6 +551,7 @@ def login():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 
 @app.route('/add_new_role', methods=['POST'])
 def add_new_role():
@@ -810,31 +705,33 @@ def get_business_units_groups():
             return jsonify({'error': 'Authorization header missing'}), 401
 
         token = auth_header.split(" ")[1]
-        url = f'{cp4d_url}/usermgmt/v2/groups'
 
-        headers = {
-            'cache-control': 'no-cache',
-            'content-type': 'application/json',
-            'Authorization': f'Bearer {token}'
-        }
+        if token["username"] == 'webuser_A' or token["username"] == 'webuser_B': 
+            url = f'{cp4d_url}/usermgmt/v2/groups'
 
-        response = requests.get(url, headers=headers, verify=False)
+            headers = {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                'Authorization': f'Bearer {token}'
+            }
 
-        if response.status_code == 200:
-            responseJson = response.json()
-            resultList = []
-            for group in responseJson["results"]:
-                if (group["name"].lower().startswith("business")):
-                    resultObject = {
-                        "group_name": group["name"],
-                        "group_description": group["description"],
-                        "role": group["roles"],
-                        "active_member": group["members_count"]
-                    }
+            response = requests.get(url, headers=headers, verify=False)
 
-                    resultList.append(resultObject)
+            if response.status_code == 200:
+                responseJson = response.json()
+                resultList = []
+                for group in responseJson["results"]:
+                    if (group["name"].lower().startswith("business")):
+                        resultObject = {
+                            "group_name": group["name"],
+                            "group_description": group["description"],
+                            "role": group["roles"],
+                            "active_member": group["members_count"]
+                        }
 
-            return jsonify({"status": "Success", "data": resultList}), 200
+                        resultList.append(resultObject)
+
+                return jsonify({"status": "Success", "data": resultList}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -895,6 +792,70 @@ def load_data():
 def save_data(data):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
+
+@app.route('/get_assets', methods=['GET'])
+def get_assets_data():
+    try: 
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+        webtoken = auth_header.split(" ")[1]
+        logged_in_user = decodeJwtToken(webtoken)
+        
+        table_assets_path = 'src/data/table-assets.json'
+        dv_list = []
+
+        # Check if the user is a dummy user
+        if logged_in_user['username'] in dummy_users:
+            with open(table_assets_path, 'r') as file:
+                dv_list = json.load(file)["objects"]
+
+        else:
+            cpadmin_username = os.getenv('username')
+            cpadmin_password = os.getenv('password')
+            data = {
+                'username': cpadmin_username,
+                'password': cpadmin_password
+            }
+            headers = {
+                'Content-Type': 'application/json'
+            }
+            cpadmin_auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
+            cpadmin_cp4d_token = cpadmin_auth_response.json().get('token')
+
+            ## Get DV table
+            cpadmin_cp4d_headers = {
+                    'cache-control': 'no-cache',
+                    'content-type': 'application/json',
+                    'Authorization': f'Bearer {cpadmin_cp4d_token}'
+                }
+            dv_api_response = requests.post(f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/tables?rolename=DV_ADMIN', headers=cpadmin_cp4d_headers)
+            dv_list = dv_api_response.json().get('objects')
+        
+        # Open file path data
+        with open(file_path, 'r') as file:
+                approval_data = json.load(file)
+                resultList = []
+                for asset in dv_list:
+                    current_data = {
+                                "table_name": asset["table_name"],
+                                "table_schema": asset["table_schema"]
+                            }
+                    found = False
+                    for data in approval_data:
+                        if asset["table_name"] == data["table_name"] and data["requestor_username"] == logged_in_user['username']:
+                            found = True
+                            current_data["is_approved"] = data["is_approved"]
+                            current_data["is_requested"] = True
+                    if not found:
+                        current_data["is_approved"] = False
+                        current_data["is_requested"] = False
+                    
+                    resultList.append(current_data)
+
+        return jsonify({"status": "Success", "data": resultList}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/get_approval_data', methods=['GET'])
 def get_approval_data():
