@@ -99,7 +99,7 @@ function Data_Exchange() {
               setButtonState({ label: 'Revoke', disabled: false, onClick: null });
             } else if (is_approved === false && is_requested === true) {
               setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
-            } else if (is_approved === null && is_requested === false) {
+            } else if (is_approved === false && is_requested === false) {
               setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
             } else {
               setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
