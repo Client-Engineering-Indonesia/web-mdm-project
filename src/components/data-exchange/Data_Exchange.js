@@ -5,8 +5,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import DataExchangeRequestForm from './DataExchangeRequestForm';
 
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
+const url = 'http://127.0.0.1:5000';
+
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -20,164 +20,112 @@ function Data_Exchange() {
     const items = [
         {
             id: 'option-0',
-            text: 'Business Unit 1',
+            text: 'DANENDRA.ATHALLARIQ@IBM.COM',
             tagId: '15'
         },
         {
             id: 'option-1',
-            text: 'Business Unit 2',
+            text: 'test@mail.com',
             tagId: '16'
         },
-    ];
-
-    const arrayObject = [
         {
-            table_name: 'BU_A_CUSTOMER',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 1',
-            request_timestamp: 'Jul 19, 2024 2:14 PM',
-            is_approved: true,
-            is_requested: true,
-            requestor_username: "user",
-
-        },
-        {
-            table_name: 'BU_B_CUSTOMER',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 2',
-            request_timestamp: 'Jul 19, 2024 2:14 PM',
-            is_approved: false,
-            is_requested: true,
-
-        },
-        {
-            table_name: 'BU_A_B_JOINED',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 2',
-            request_timestamp: 'Jul 19, 2024 2:22 PM',
-            is_approved: null,
-            is_requested: false,
-
-        },
-        {
-            table_name: 'AUDIT',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 1',
-            request_timestamp: 'Jul 4, 2024 3:27 PM',
-            is_approved: null,
-            is_requested: false,
-
-        },
-        {
-            table_name: 'MORTGAGE_CANDIDATE',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 2',
-            request_timestamp: 'Jul 4, 2024 3:27 PM',
-            is_approved: true,
-            is_requested: true,
-
-        },
-        {
-            table_name: 'EMPLOYEE_RECORDS',
-            table_schema: 'CPADMIN',
-            business_name: 'Business Unit 3',
-            request_timestamp: 'Jul 1, 2024 2:03 PM',
-            is_approved: true,
-            is_requested: true,
-
-        },
-        {
-            table_name: 'CUSTOMER_TEST',
-            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
-            business_name: 'Business Unit 4',
-            request_timestamp:'Jun 29, 2024 10:51 PM',
-            is_approved: false,
-            is_requested: true,
-
-        },
-        {
-            table_name: 'EMPLOYEE',
-            table_schema: 'CPADMIN',
-            business_name: 'Business Unit 4',
-            request_timestamp:'Jun 28, 2024 1:38 PM',
-            is_approved: null,
-            is_requested: false,
-
+            id: 'option-1',
+            text: 'schema',
+            tagId: '17'
         },
     ];
+    
 
+    const [data, setData] = useState([]);
+    const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
 
-    // const [buttonState, setButtonState] = useState({ label: '', disabled: false, onClick: null });
+    useEffect(() => {
+        console.log('Token in useEffect:', isToken);
+    }, [isToken]); // This will run whenever isToken changes
+    
+    useEffect(() => {
+        const token = Cookies.get('web_token');
+        setIsToken(token || '');
+        fetchData();
+    }, []);
 
-    // useEffect(() => {
-    //     loadButtonState();
-    // }, []);
-      
-    // const loadButtonState = () => {
-    //     // if is_approved is true and is_requqested is true, then the button should be revoke
-    //     // if is_approved is false and is_requested is true, then the button should be pending approval, make button disable
-    //     // if is_approved is null and is_requested is false, then the button should be request access
-    //     // do it without cookies, but based on is_approved and is_requested
-    //     const { is_approved, is_requested } = arrayObject;
-    //     console.log(is_approved, is_requested);
+    const fetchData = async () => {
+        try {
+            const token = isToken;
+            const response = await axios.get(`${url}/get_assets`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                params: {
+                    webtoken: token
+                }
+            });
+            console.log(response);
+            console.log(response.data.data);
+            setData(response.data.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+    
+    // State to track the submission status of each item
+    const [submissionStatus, setSubmissionStatus] = useState(
+        data.map(() => false)
+    );
 
-    //     if (is_approved === true && is_requested === true) {
-    //         setButtonState({ label: 'Revoke', disabled: false, onClick: null });
-    //       } else if (is_approved === false && is_requested === true) {
-    //         setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
-    //       } else if (is_approved === null && is_requested === false) {
-    //         setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
-    //       } else {
-    //         setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
-    //     }
-    // };
+    console.log(submissionStatus)
 
-    const ButtonComponent = ({ item }) => {
+    const handleSubmission = (index) => {
+        const newStatus = [...submissionStatus];
+        newStatus[index] = true;
+        setSubmissionStatus(newStatus);
+    };
+
+    const ButtonComponent = ({ item, index }) => {
         const [buttonState, setButtonState] = useState({ label: '', disabled: false, onClick: null });
     
         useEffect(() => {
           loadButtonState();
-        }, [item]); // Trigger useEffect whenever item changes
+        }, [item, submissionStatus[index]]); // Trigger useEffect whenever item or submission status changes
     
         const loadButtonState = () => {
-            // if is_approved is true and is_requqested is true, then the button should be revoke
-            // if is_approved is false and is_requested is true, then the button should be pending approval, make button disable
-            // if is_approved is null and is_requested is false, then the button should be request access
-            // do it without cookies, but based on is_approved and is_requested
-          const { is_approved, is_requested } = item;
-    
-          if (is_approved === true && is_requested === true) {
-            setButtonState({ label: 'Revoke', disabled: false, onClick: null });
-          } else if (is_approved === false && is_requested === true) {
+          if (submissionStatus[index]) {
             setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
-          } else if (is_approved === null && is_requested === false) {
-            setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
           } else {
-            setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+            const { is_approved, is_requested } = item;
+    
+            if (is_approved === true && is_requested === true) {
+              setButtonState({ label: 'Revoke', disabled: false, onClick: null });
+            } else if (is_approved === false && is_requested === true) {
+              setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
+            } else if (is_approved === null && is_requested === false) {
+              setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
+            } else {
+              setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+            }
           }
         };
     
         return (
-            <Button kind="primary" onClick={buttonState.onClick} disabled={buttonState.disabled}>
-                {buttonState.label}
-            </Button>
+          <Button kind="primary" onClick={buttonState.onClick} disabled={buttonState.disabled}>
+            {buttonState.label}
+          </Button>
         );
-      };
-
-    
-
-
-    useEffect(() => {
-        if (selectedFilter) {
-            setFilteredItems(arrayObject.filter(item => item.business_name === selectedFilter.text));
-        } else {
-            setFilteredItems(arrayObject);
-        }
-    }, [selectedFilter]);
-
-    const handleDropdownChange = (event) => {
-        setSelectedFilter(event.selectedItem);
     };
+
+
+    // useEffect(() => {
+    //     if (selectedFilter) {
+    //         setFilteredItems(data.filter(item => item.table_schema === selectedFilter.text));
+    //     } else {
+    //         setFilteredItems(data);
+    //     }
+    // }, [selectedFilter]);
+
+    // const handleDropdownChange = (event) => {
+    //     setSelectedFilter(event.selectedItem);
+    // };
 
     return (
         <section className='data-exchange'>
@@ -207,24 +155,28 @@ function Data_Exchange() {
                             <p>All Data Product (1000 Results)</p>
                             <p>Showing 1 of 50</p>
                             <div className='dropdown'>
-                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} onChange={handleDropdownChange} />
+                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} />
+                                    
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className='request-list'>
-                    {filteredItems.map((item, index) => (
+                    {Array.isArray(data) && data.map((item, index) => (
                         <div key={index} className='list-detail'>
                             <p>Table Name: {item.table_name}</p>
                             <p>Table Schema: {item.table_schema}</p>
-                            <p>Business Name: {item.business_name}</p>
-                            <p>Created Date: {item.request_timestamp}</p>
                             <ButtonComponent item={item} />
+                            <DataExchangeRequestForm
+                                isOpen={isSidebarOpen}
+                                onClose={toggleSidebar}
+                                onSubmit={() => handleSubmission(index)}
+                            />
                         </div>
                     ))}
                 </div>
             </section>
-            <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} />
+            {/* <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} onSubmit={() => handleSubmission(index)}/> */}
         </section>
     );
 }
