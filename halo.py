@@ -705,32 +705,31 @@ def get_business_units_groups():
 
         token = auth_header.split(" ")[1]
 
-        if token["username"] == 'webuser_A' or token["username"] == 'webuser_B': 
-            url = f'{cp4d_url}/usermgmt/v2/groups'
+        url = f'{cp4d_url}/usermgmt/v2/groups'
 
-            headers = {
-                'cache-control': 'no-cache',
-                'content-type': 'application/json',
-                'Authorization': f'Bearer {token}'
-            }
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
 
-            response = requests.get(url, headers=headers, verify=False)
+        response = requests.get(url, headers=headers, verify=False)
 
-            if response.status_code == 200:
-                responseJson = response.json()
-                resultList = []
-                for group in responseJson["results"]:
-                    if (group["name"].lower().startswith("business")):
-                        resultObject = {
-                            "group_name": group["name"],
-                            "group_description": group["description"],
-                            "role": group["roles"],
-                            "active_member": group["members_count"]
-                        }
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for group in responseJson["results"]:
+                if (group["name"].lower().startswith("business")):
+                    resultObject = {
+                        "group_name": group["name"],
+                        "group_description": group["description"],
+                        "role": group["roles"],
+                        "active_member": group["members_count"]
+                    }
 
-                        resultList.append(resultObject)
+                    resultList.append(resultObject)
 
-                return jsonify({"status": "Success", "data": resultList}), 200
+            return jsonify({"status": "Success", "data": resultList}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -800,7 +799,7 @@ def get_assets_data():
             return jsonify({'error': 'Authorization header missing'}), 401
         webtoken = auth_header.split(" ")[1]
         logged_in_user = decodeJwtToken(webtoken)
-        
+
         table_assets_path = 'src/data/table-assets.json'
         dv_list = []
 
