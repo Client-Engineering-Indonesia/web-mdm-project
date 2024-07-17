@@ -3,20 +3,21 @@ import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
 import Cookies from 'js-cookie';
 
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+const url = 'http://127.0.0.1:5000';
 
 const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
     requestor_username: '',
     requestor_role: 'Viewer',
-    data_set_name: '',
+    table_name: '', // table name
     owner_email: '',
     owner_name: '',
     owner_phone: '',
     description: '',
     duration: '',
+    table_schema: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -56,13 +57,14 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: formData.requestor_username,
         requestor_role: formData.requestor_role,
-        table_name: formData.data_set_name,
+        table_name: formData.table_name,
         owner_email: formData.owner_email,
         owner_name: formData.owner_name,
         owner_phone: formData.owner_phone,
         description: formData.description,
         duration: formData.duration,
-        webtoken: webToken
+        table_schema: formData.table_schema,
+        webtoken: webToken,
       };
 
       try {
@@ -143,7 +145,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                rows={4}
+                rows={1}
               />
               <TextInput
                 id="duration"
@@ -154,6 +156,13 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
                 invalid={!!errors.duration}
                 invalidText={errors.duration}
                 type="number"
+              />
+              <TextInput 
+                id="table-schema"
+                labelText={<span style={{ color: 'white' }}>Table Schema</span>}
+                name="table_schema"
+                value={formData.table_schema}
+                onChange={handleChange}
               />
               <div>
                 <Button type="button" onClick={onClose} kind="secondary" style={{ width: '10rem' }}>Cancel</Button>

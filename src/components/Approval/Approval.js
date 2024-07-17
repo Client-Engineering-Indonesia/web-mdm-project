@@ -17,6 +17,7 @@ import {
 import { CheckmarkOutline, MisuseOutline, View } from '@carbon/icons-react';
 import axios from 'axios';
 import './Approval.css';
+import Cookies from 'js-cookie';
 
 const headers = [
     { key: 'is_approved', header: 'Status' },
@@ -24,17 +25,18 @@ const headers = [
     { key: 'requestor_username', header: 'UserName' },
     { key: 'requestor_role', header: 'Role' },
     { key: 'table_name', header: 'Table Name' },
-    { key: 'owner_email', header: 'Email' },
-    { key: 'owner_name', header: 'Name' },
-    { key: 'owner_phone', header: 'Phone' },
+    { key: 'table_schema', header: 'Table Schema' },
+    // { key: 'owner_email', header: 'Email' },
+    // { key: 'owner_name', header: 'Name' },
+    // { key: 'owner_phone', header: 'Phone' },
     { key: 'description', header: 'Description' },
     { key: 'request_timestamp', header: 'Request Timestamp' },
     { key: 'approved_timestamp', header: 'Approved Timestamp' },
     { key: 'expire_date', header: 'Expire Date' }
 ];
 
-const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+const url = 'http://127.0.0.1:5000';
 
 const Approval = () => {
 
@@ -59,14 +61,14 @@ const Approval = () => {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            // console.log('fetch data', data);
+            console.log('fetch data', data);
 
             // Update state with fetched data
             setDatas(data);
 
             // Filter rows based on status
-            const rowsPending = data.filter(f => f.is_approved === null);
-            const rowsActive = data.filter(f => f.is_approved !== null);
+            const rowsPending = data.filter(f => f.is_approved === false);
+            const rowsActive = data.filter(f => f.is_approved === true);
             setFilteredPendingRows(rowsPending);
             setFilteredActiveRows(rowsActive);
         } catch (error) {
@@ -85,8 +87,15 @@ const Approval = () => {
             const confirmMessage = action === 'approve' ? 'Approve this request?' : 'Reject this request?';
             if (window.confirm(confirmMessage)) {
                 const newStatus = action === 'approve' ? true : false;
+                const webToken = Cookies.get('web_token');
+                var body = {
+                    status: newStatus,
+                    table_name: row.table_name,
+                    table_schema: row.table_schema,
+                    webtoken: webToken
+                }
 
-                axios.put(`${url}/update_approval_status/${row.id}`, { status: newStatus })
+                axios.put(`${url}/update_approval_status/${row.id}`, body)
                     .then(response => {
                         console.log(`${action} request`, response.data.message);
                         fetchData();

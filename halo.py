@@ -563,13 +563,13 @@ def assign_role(username):
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-        print(data)
+
         user_roles = data.get('user_roles')
         webToken = data.get('webtoken')
         if not username or not user_roles or not webToken: 
             return jsonify({'error': 'Missing required parameters'}), 400
         user_info = decodeJwtToken(data.get('webtoken'))
-        print(user_info)
+
         token = user_info["cp4d_token"]
         url = f'{cp4d_url}/usermgmt/v1/user/{username}'
 
@@ -781,7 +781,37 @@ def update_approval_status(id):
                     entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
                     updated = True
                     break
+            
+            request_id = request.json.get(id)
+            table_name = request.json.get('table_name')
+            authid = user_info["username"]
+            table_schema = request.json.get('table_schema')
 
+            token = user_info.get('cp4d_token')
+            url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
+
+            headers = {
+                'content-type': 'application/json',
+                'Authorization': f'Bearer {token}'
+            }
+            payload = {
+                "table_name": table_name,
+                "table_schema": table_schema,
+                "authid": authid
+            }
+            access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+
+            if access_response.status_code == 200:
+                with open(file_path, 'r') as file:
+                    data = json.load(file)
+
+                found = False
+                for item in data:
+                    if item["id"] == request_id:
+                        item["is_approved"] = True
+                        item["approved_timestamp"] = current_timestamp()
+                        found = True
+                        
             if updated:
                 save_data(data)
                 return jsonify({'message': f'Status updated for ID {id}'}), 200
@@ -804,6 +834,10 @@ def create_request():
         timestamp = current_timestamp()
         unique_id = str(uuid.uuid4())[:8]
 
+        duration = int(data.get('duration'))
+        expire_timestamp = datetime.now() + timedelta(days=duration)
+        formatted_expire_timestamp = expire_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
         new_request = {
             "id": unique_id,
             "is_approved": True if 'admin' in user_info["role"].lower() else False,
@@ -815,9 +849,10 @@ def create_request():
             "owner_name": data.get('owner_name'),
             "owner_phone": data.get('owner_phone'),
             "description": data.get('description'),
+            "table_schema": data.get('table_schema'),
             "request_timestamp": timestamp,
             "approved_timestamp": None,
-            "expire_date": data.get('duration')
+            "expire_date": formatted_expire_timestamp
         }
 
         json_path = file_path
@@ -839,7 +874,7 @@ def create_request():
 # Endpoint 
 endpoint_file_path = 'src/data/endpoint-data.json'
 
-@app.route('/get_endpoint_data', methods=['GET'])
+@app.route('/get_endpoint_data', methods=['POST'])
 def get_endpoint_data():
     try: 
         req_body = request.get_json()
@@ -866,6 +901,7 @@ def get_endpoint_data():
         }), 200
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
     
 @app.route('/create_new_endpoint', methods=['POST'])
@@ -907,79 +943,87 @@ def create_new_endpoint():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Graph Visualization
-dv_data_exchange_df = pd.read_csv('src/data/dv_log_processed.csv')
-view_df = pd.read_csv('src/data/table_access_log.csv')
-table_access_count = view_df['table_accessed'].value_counts()
-VIRTUALIZED_DATA = dv_data_exchange_df["dv_table_name"].unique()
+#Data Constant
+DV_DATA_EXCHANGE_DF = pd.read_csv('src/data/dv_log_processed.csv')
+DV_DATA_EXCHANGE_DF['eventTime'] = pd.to_datetime(DV_DATA_EXCHANGE_DF['eventTime']).dt.date
+VIEW_DF = pd.read_csv('src/data/table_access_log.csv')
+TABLE_ACCESS_COUNT = VIEW_DF['table_accessed'].value_counts()
+VIRTUALIZED_DATA = DV_DATA_EXCHANGE_DF["dv_table_name"].unique()
+#Graph Creation
+def graph_main(start_date, end_date):
+    def filter_df(start_date, end_date, df):
+        """
+        Input in this format
+            start_date : {day}-{month}-{year} I.E 15-07-2024
+            end_date : {day}-{month}-{year} I.E 15-07-2024
+        """
+        start_date = "-".join(start_date.split('-')[::-1])
+        start_date = pd.to_datetime(start_date).date()
+        end_date = "-".join(end_date.split('-')[::-1])
+        end_date = pd.to_datetime(end_date).date()
+        df = df[
+            (df['eventTime']>=start_date) &
+            (df['eventTime']<=end_date)
+        ]
+        return df
+    def create_graph(dv_data_exchange_df, table_access_count):
+        # Create a directed graph
+        G = nx.DiGraph()
 
-def create_graph(dv_data_exchange_df, view_df):
-    # Create a directed graph
-    G = nx.DiGraph()
+        # Process the DataFrame to add or remove edges based on actions
+        for index, row in dv_data_exchange_df.iterrows():
+            table = row['dv_table_name']
+            target = row['dv_user_target']
+            owner = row['initiator_id']
+            if row['action'] == 'data-virtualization..implicit_grant.configure':
+                G.add_edge(owner, table)
+            if row['action'] == 'data-virtualization.grant.configure':
+                G.add_edge(owner, table)
+                G.add_edge(table, target)
+            elif row['action'] == 'data-virtualization.revoke.configure':
+                if G.has_edge(table, target):
+                    G.remove_edge(table, target)
+        # Add custom metrics to nodes
+        for node in G.nodes():
+            if node in VIRTUALIZED_DATA:
+                G.nodes[node]['access_count'] = table_access_count[node]
+        return G
+    def post_process_graph(G):
+        # get position
+        nodes_positions = nx.circular_layout(G)
+        node_data_array = []
+        link_data_array = []
+        #get node data array
+        for node in G.nodes():
+            x, y = nodes_positions[node]
+            node_data = {"key":node}
+            if node in VIRTUALIZED_DATA:
+                node_data['text'] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
+                node_data['type'] = "database"
+            else:
+                node_data["type"] = "user"
+                node_data['text'] = node
+            node_data_array.append(node_data)
+        # Get node edge array
+        for i, edge in enumerate(G.edges()):
+            src, dest = edge
+            edge_data = {"key":i, "from":src, "to":dest}
+            link_data_array.append(edge_data)
+        return node_data_array, link_data_array
+    df = filter_df(start_date, end_date, DV_DATA_EXCHANGE_DF)
+    G = create_graph(df, TABLE_ACCESS_COUNT)
+    return post_process_graph(G)
 
-    # Process the DataFrame to add or remove edges based on actions
-    for index, row in dv_data_exchange_df.iterrows():
-        table = row['dv_table_name']
-        target = row['dv_user_target']
-        owner = row['initiator_id']
-        if row['action'] == 'data-virtualization..implicit_grant.configure':
-            G.add_edge(owner, table)
-        if row['action'] == 'data-virtualization.grant.configure':
-            G.add_edge(owner, table)
-            G.add_edge(table, target)
-        elif row['action'] == 'data-virtualization.revoke.configure':
-            if G.has_edge(table, target):
-                G.remove_edge(table, target)
-    # Add custom metrics to nodes
-    for node in G.nodes():
-        if node in VIRTUALIZED_DATA:
-            G.nodes[node]['access_count'] = table_access_count[node]
-    return G
-
-def visualize_graph(G, filename):
-    # Define node colors based on node type (table or user)
-    node_colors = []
-    db_image = mpimg.imread('src/data/person1.png')
-    person_image = mpimg.imread('src/data/database2.png')
-
-    # Draw the graph
-    plt.figure(figsize=(20, 20))
-    pos = nx.circular_layout(G)
-    fig, ax = plt.subplots(figsize=(35, 12))
-    plt.title('Access Graph')
-
-    for node in G.nodes():
-        x, y = pos[node]
-        if any(node == row['dv_table_name'] for _, row in dv_data_exchange_df.iterrows()):
-            img = person_image
-        else:
-            img = db_image
-        imagebox = OffsetImage(img, zoom=0.5)
-        ab = AnnotationBbox(imagebox, (x, y + 0.1), frameon=False)
-        ax.add_artist(ab)
-
-    # Get node labels for visualization
-    node_labels = {}
-    for node in G.nodes():
-        if node not in VIRTUALIZED_DATA:
-            node_labels[node] = node
-        else:
-            node_labels[node] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
-    
-    nx.draw_circular(G, with_labels=True, node_color=node_colors, labels=node_labels, edge_color='gray', node_size=3000, font_size=8, font_weight='200', arrows=True)
-    
-    plt.savefig(filename)
-    plt.close()
-
-@app.route('/get_graph')
-def get_graph_image():
-    try: 
-        filename = 'src/data/graph.png'
-        # G = create_graph(dv_data_exchange_df, view_df)
-        # visualize_graph(G, filename)
-
-        return jsonify({"status": "Success", "file_path": filename}), 200
-    
+@app.route('/create_graph', methods=['POST'])
+def create_graph():
+    try:
+        data = request.get_json()
+        start_date, end_date = data['start_date'], data['end_date']
+        node_data_array, link_data_array = graph_main(start_date, end_date)
+        return jsonify({
+            'nodeDataArray': node_data_array,
+            'linkDataArray': link_data_array
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

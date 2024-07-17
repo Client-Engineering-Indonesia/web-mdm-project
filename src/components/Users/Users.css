@@ -9,13 +9,14 @@
   gap: 40px;
 }
 
-.users-content {
-  border: 2px solid #f0f0f0;
-}
-
 .title {
   margin-top: 20px;
   margin-left: 15px;
+}
+
+.title p {
+  font-size: 32px;
+  font-weight: bold;
 }
 
 .menus p {
@@ -60,7 +61,7 @@
   border-width: 1px;
   border-style: solid;
   border-color: transparent;
-  background-color: var(--cds-button-primary, white);
+  background-color: var(--cds-button-primary, rgb(14, 12, 12));
   color: var(--cds-text-on-color, black);
 }
 
