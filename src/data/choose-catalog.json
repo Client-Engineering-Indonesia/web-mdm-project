@@ -1,0 +1,26 @@
+[
+    {
+        "table_name": "BU_A_CUSTOMER"
+    },
+    {
+        "table_name": "BU_B_CUSTOMER"
+    },
+    {
+        "table_name": "BU_A_B_JOINED"
+    },
+    {
+        "table_name": "AUDIT"
+    },
+    {
+        "table_name": "MORTGAGE_CANDIDATE"
+    },
+    {
+        "table_name": "EMPLOYEE_RECORDS"
+    },
+    {
+        "table_name": "CUSTOMER_TEST"
+    },
+    {
+        "table_name": "EMPLOYEE"
+    }
+]

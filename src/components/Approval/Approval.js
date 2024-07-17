@@ -35,8 +35,8 @@ const headers = [
     { key: 'expire_date', header: 'Expire Date' }
 ];
 
-// const url = 'http://127.0.0.1:5000';
-const url = 'http://127.0.0.1:5000';
+// const url = 'http://52.118.170.239:8443';
+const url = 'http://52.118.170.239:8443';
 
 const Approval = () => {
 
@@ -82,7 +82,7 @@ const Approval = () => {
     }, []);
 
 
-    const handleActionClick = (row, action) => {
+    const handleActionClick = (row, action, data) => {
         if (action === 'approve' || action === 'reject') {
             const confirmMessage = action === 'approve' ? 'Approve this request?' : 'Reject this request?';
             if (window.confirm(confirmMessage)) {
@@ -95,6 +95,8 @@ const Approval = () => {
                     table_schema: row.cells.find(cell => cell.info.header === 'table_schema').value,
                     webtoken: webToken
                 };
+
+                console.log(row)
 
                 axios.put(`${url}/update_approval_status/${row.id}`, body)
                     .then(response => {

@@ -9,6 +9,9 @@ COPY package.json ./
 RUN npm install
 RUN npm install js-cookie
 RUN npm install jwt-decode
+RUN npm install gojs
+RUN npm install gojs-react
+RUN npm install axios
 
 # Copy the rest of the application and build the React app
 COPY ./ ./

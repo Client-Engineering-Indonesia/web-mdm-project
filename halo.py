@@ -58,7 +58,6 @@ def grant_access():
     try:
         data = request.get_json()
     
-
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
@@ -407,8 +406,28 @@ def get_assignment_roles():
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-# login
+
+dummy_users = {
+    'webuser_A': {
+        'user_id': '1',
+        'username': 'webuser_A',
+        'user_email': 'webusera@mail.com',
+        'business_unit_name': 'Business Unit A',
+        'business_unit_id': '10001',
+        'role': 'Business Unit User',
+        'cp4d_token': 'dummy_token_A'
+    },
+    'webuser_B': {
+        'user_id': '2',
+        'username': 'webuser_B',
+        'user_email': 'webuserb@mail.com',
+        'business_unit_name': 'Business Unit B',
+        'business_unit_id': '10002',
+        'role': 'Business Unit User',
+        'cp4d_token': 'dummy_token_B'
+    }
+}
+
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -423,6 +442,26 @@ def login():
         if not username or not password:
             return jsonify({'error': 'Missing required parameters'}), 400
 
+        # Check if the user is a dummy user
+        if username in dummy_users:
+            user_info = dummy_users[username]
+
+            jwt_payload = {
+                'uid': user_info['user_id'],
+                'username': user_info['username'],
+                'user_email': user_info['user_email'],
+                'role': user_info['role'],
+                'business_unit_name': user_info['business_unit_name'],
+                'business_unit_id': user_info['business_unit_id'],
+                'cp4d_token': user_info['cp4d_token'],
+                'exp': datetime.utcnow() + timedelta(hours=5)  # Token expiration time
+            }
+
+            jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
+
+            return jsonify({'jwt_token': jwt_token}), 200
+
+        # If not a dummy user, proceed with CP4D authentication
         headers = {
             'content-type': 'application/json'
         }
@@ -503,15 +542,16 @@ def login():
             'business_unit_name': business_unit_name,
             'business_unit_id': business_unit_id,
             'cp4d_token': cp4d_token,
-            'exp': datetime.now() + timedelta(hours=5)  # Token expiration time
+            'exp': datetime.utcnow() + timedelta(hours=5)  # Token expiration time
         }
 
         jwt_token = jwt.encode(jwt_payload, secret, algorithm='HS256')
 
         return jsonify({'jwt_token': jwt_token}), 200
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 
 @app.route('/add_new_role', methods=['POST'])
 def add_new_role():
@@ -563,13 +603,12 @@ def assign_role(username):
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-        print(data)
         user_roles = data.get('user_roles')
         webToken = data.get('webtoken')
         if not username or not user_roles or not webToken: 
             return jsonify({'error': 'Missing required parameters'}), 400
+        user_info = decodeJwtToken(data.get('webtoken'))
 
-        user_info = decodeJwtToken(data.get('web_token'))
         token = user_info["cp4d_token"]
         url = f'{cp4d_url}/usermgmt/v1/user/{username}'
 
@@ -665,31 +704,33 @@ def get_business_units_groups():
             return jsonify({'error': 'Authorization header missing'}), 401
 
         token = auth_header.split(" ")[1]
-        url = f'{cp4d_url}/usermgmt/v2/groups'
 
-        headers = {
-            'cache-control': 'no-cache',
-            'content-type': 'application/json',
-            'Authorization': f'Bearer {token}'
-        }
+        if token["username"] == 'webuser_A' or token["username"] == 'webuser_B': 
+            url = f'{cp4d_url}/usermgmt/v2/groups'
 
-        response = requests.get(url, headers=headers, verify=False)
+            headers = {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                'Authorization': f'Bearer {token}'
+            }
 
-        if response.status_code == 200:
-            responseJson = response.json()
-            resultList = []
-            for group in responseJson["results"]:
-                if (group["name"].lower().startswith("business")):
-                    resultObject = {
-                        "group_name": group["name"],
-                        "group_description": group["description"],
-                        "role": group["roles"],
-                        "active_member": group["members_count"]
-                    }
+            response = requests.get(url, headers=headers, verify=False)
 
-                    resultList.append(resultObject)
+            if response.status_code == 200:
+                responseJson = response.json()
+                resultList = []
+                for group in responseJson["results"]:
+                    if (group["name"].lower().startswith("business")):
+                        resultObject = {
+                            "group_name": group["name"],
+                            "group_description": group["description"],
+                            "role": group["roles"],
+                            "active_member": group["members_count"]
+                        }
 
-            return jsonify({"status": "Success", "data": resultList}), 200
+                        resultList.append(resultObject)
+
+                return jsonify({"status": "Success", "data": resultList}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -751,6 +792,70 @@ def save_data(data):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
 
+@app.route('/get_assets', methods=['GET'])
+def get_assets_data():
+    try: 
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'error': 'Authorization header missing'}), 401
+        webtoken = auth_header.split(" ")[1]
+        logged_in_user = decodeJwtToken(webtoken)
+        
+        table_assets_path = 'src/data/table-assets.json'
+        dv_list = []
+
+        # Check if the user is a dummy user
+        if logged_in_user['username'] in dummy_users:
+            with open(table_assets_path, 'r') as file:
+                dv_list = json.load(file)["objects"]
+
+        else:
+            cpadmin_username = os.getenv('username')
+            cpadmin_password = os.getenv('password')
+            data = {
+                'username': cpadmin_username,
+                'password': cpadmin_password
+            }
+            headers = {
+                'Content-Type': 'application/json'
+            }
+            cpadmin_auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
+            cpadmin_cp4d_token = cpadmin_auth_response.json().get('token')
+
+            ## Get DV table
+            cpadmin_cp4d_headers = {
+                    'cache-control': 'no-cache',
+                    'content-type': 'application/json',
+                    'Authorization': f'Bearer {cpadmin_cp4d_token}'
+                }
+            dv_api_response = requests.post(f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/tables?rolename=DV_ADMIN', headers=cpadmin_cp4d_headers)
+            dv_list = dv_api_response.json().get('objects')
+        
+        # Open file path data
+        with open(file_path, 'r') as file:
+                approval_data = json.load(file)
+                resultList = []
+                for asset in dv_list:
+                    current_data = {
+                                "table_name": asset["table_name"],
+                                "table_schema": asset["table_schema"]
+                            }
+                    found = False
+                    for data in approval_data:
+                        if asset["table_name"] == data["table_name"] and data["requestor_username"] == logged_in_user['username']:
+                            found = True
+                            current_data["is_approved"] = data["is_approved"]
+                            current_data["is_requested"] = True
+                    if not found:
+                        current_data["is_approved"] = False
+                        current_data["is_requested"] = False
+                    
+                    resultList.append(current_data)
+
+        return jsonify({"status": "Success", "data": resultList}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/get_approval_data', methods=['GET'])
 def get_approval_data():
     try:
@@ -765,58 +870,62 @@ def get_approval_data():
 @app.route('/update_approval_status/<id>', methods=['PUT'])
 def update_approval_status(id):
     try:
-        new_status = request.json.get('status')
+        user_request = request.get_json()
+        print(user_request)
+        new_status = user_request.get('status')
         current_time = datetime.now()
-        user_info = decodeJwtToken(request.json.get('webtoken'))
+        user_info = decodeJwtToken(user_request.get('webtoken'))
         
-        if 'role' in user_info and 'admin' not in user_info["role"].lower():
-            return jsonify({'error': 'You do not have permission to approve this request'}), 400
+        # if 'role' in user_info and 'admin' not in user_info["role"].lower():
+        #     return jsonify({'error': 'You do not have permission to approve this request'}), 400
     
-        else: 
-            data = load_data()
-            updated = False
-            for entry in data:
-                if entry['id'] == id:
-                    entry['is_approved'] = new_status
-                    entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
-                    updated = True
-                    break
-            
-            request_id = request.json.get(id)
-            table_name = request.json.get('table_name')
-            authid = user_info["username"]
-            table_schema = request.json.get('table_schema')
+        # else: 
+        data = load_data()
+        updated = False
+        for entry in data:
+            if entry['id'] == id:
+                entry['is_approved'] = new_status
+                entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
+                updated = True
+                break
+        
+        request_id = user_request.get("id")
+        table_name = user_request.get('table_name')
+        authid = user_request.get('username')
+        table_schema = user_request.get('table_schema')
 
-            token = user_info.get('cp4d_token')
-            url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
+        token = user_info.get('cp4d_token')
+        url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
 
-            headers = {
-                'content-type': 'application/json',
-                'Authorization': f'Bearer {token}'
-            }
-            payload = {
-                "table_name": table_name,
-                "table_schema": table_schema,
-                "authid": authid
-            }
-            access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
+        payload = {
+            "table_name": table_name,
+            "table_schema": table_schema,
+            "authid": authid
+        }
 
-            if access_response.status_code == 200:
-                with open(file_path, 'r') as file:
-                    data = json.load(file)
+        print(payload)
+        access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
 
-                found = False
-                for item in data:
-                    if item["id"] == request_id:
-                        item["is_approved"] = True
-                        item["approved_timestamp"] = current_timestamp()
-                        found = True
-                        
-            if updated:
-                save_data(data)
-                return jsonify({'message': f'Status updated for ID {id}'}), 200
-            else:
-                return jsonify({'error': f'ID {id} not found'}), 404
+        if access_response.status_code == 200:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+
+            found = False
+            for item in data:
+                if item["id"] == request_id:
+                    item["is_approved"] = True
+                    item["approved_timestamp"] = current_timestamp()
+                    found = True
+                    
+        if updated:
+            save_data(data)
+            return jsonify({'message': f'Status updated for ID {id}'}), 200
+        else:
+            return jsonify({'error': f'ID {id} not found'}), 404
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
