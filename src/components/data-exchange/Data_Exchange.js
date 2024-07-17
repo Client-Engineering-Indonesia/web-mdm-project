@@ -36,63 +36,127 @@ function Data_Exchange() {
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 1',
             request_timestamp: 'Jul 19, 2024 2:14 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: true,
+            is_requested: true,
+            requestor_username: "user",
+
         },
         {
             table_name: 'BU_B_CUSTOMER',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 2',
             request_timestamp: 'Jul 19, 2024 2:14 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: false,
+            is_requested: true,
+
         },
         {
             table_name: 'AUDIT',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 1',
             request_timestamp: 'Jul 4, 2024 3:27 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: null,
+            is_requested: false,
+
         },
         {
             table_name: 'MORTGAGE_CANDIDATE',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 2',
             request_timestamp: 'Jul 4, 2024 3:27 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: true,
+            is_requested: true,
+
         },
         {
             table_name: 'EMPLOYEE_RECORDS',
             table_schema: 'CPADMIN',
             business_name: 'Business Unit 3',
             request_timestamp: 'Jul 1, 2024 2:03 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: true,
+            is_requested: true,
+
         },
         {
             table_name: 'CUSTOMER_TEST',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 4',
             request_timestamp:'Jun 29, 2024 10:51 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: false,
+            is_requested: true,
+
         },
         {
             table_name: 'EMPLOYEE',
             table_schema: 'CPADMIN',
             business_name: 'Business Unit 4',
             request_timestamp:'Jun 28, 2024 1:38 PM',
-            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+            is_approved: null,
+            is_requested: false,
+
         },
     ];
 
-    const loadButtonState = () => {
-        const savedState = Cookies.get('buttonState');
-        return savedState ? JSON.parse(savedState) : Array(arrayObject.length).fill(false);
-    };
 
-    const [changeButton, setChangeButton] = useState(loadButtonState);
+    // const [buttonState, setButtonState] = useState({ label: '', disabled: false, onClick: null });
 
-    useEffect(() => {
-        Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 100000 });
+    // useEffect(() => {
+    //     loadButtonState();
+    // }, []);
+      
+    // const loadButtonState = () => {
+    //     // if is_approved is true and is_requqested is true, then the button should be revoke
+    //     // if is_approved is false and is_requested is true, then the button should be pending approval, make button disable
+    //     // if is_approved is null and is_requested is false, then the button should be request access
+    //     // do it without cookies, but based on is_approved and is_requested
+    //     const { is_approved, is_requested } = arrayObject;
+    //     console.log(is_approved, is_requested);
 
-    }, [changeButton]);
+    //     if (is_approved === true && is_requested === true) {
+    //         setButtonState({ label: 'Revoke', disabled: false, onClick: null });
+    //       } else if (is_approved === false && is_requested === true) {
+    //         setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
+    //       } else if (is_approved === null && is_requested === false) {
+    //         setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
+    //       } else {
+    //         setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+    //     }
+    // };
+
+    const ButtonComponent = ({ item }) => {
+        const [buttonState, setButtonState] = useState({ label: '', disabled: false, onClick: null });
+    
+        useEffect(() => {
+          loadButtonState();
+        }, [item]); // Trigger useEffect whenever item changes
+    
+        const loadButtonState = () => {
+            // if is_approved is true and is_requqested is true, then the button should be revoke
+            // if is_approved is false and is_requested is true, then the button should be pending approval, make button disable
+            // if is_approved is null and is_requested is false, then the button should be request access
+            // do it without cookies, but based on is_approved and is_requested
+          const { is_approved, is_requested } = item;
+    
+          if (is_approved === true && is_requested === true) {
+            setButtonState({ label: 'Revoke', disabled: false, onClick: null });
+          } else if (is_approved === false && is_requested === true) {
+            setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
+          } else if (is_approved === null && is_requested === false) {
+            setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
+          } else {
+            setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+          }
+        };
+    
+        return (
+            <Button kind="primary" onClick={buttonState.onClick} disabled={buttonState.disabled}>
+                {buttonState.label}
+            </Button>
+        );
+      };
+
+    
+
 
     useEffect(() => {
         if (selectedFilter) {
@@ -146,9 +210,7 @@ function Data_Exchange() {
                             <p>Table Schema: {item.table_schema}</p>
                             <p>Business Name: {item.business_name}</p>
                             <p>Created Date: {item.request_timestamp}</p>
-                            <p>Description: {item.description}</p>
-                            {changeButton[index] === false && <Button size='md' onClick={toggleSidebar} className='request-access'>Request Access</Button>}
-                            {changeButton[index] === true && <Button size='md' className='request-access'>Revoke</Button>}
+                            <ButtonComponent item={item} />
                         </div>
                     ))}
                 </div>
