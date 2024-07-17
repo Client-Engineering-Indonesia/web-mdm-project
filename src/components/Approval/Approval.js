@@ -88,13 +88,13 @@ const Approval = () => {
             if (window.confirm(confirmMessage)) {
                 const newStatus = action === 'approve' ? true : false;
                 const webToken = Cookies.get('web_token');
-                var body = {
+                const body = {
                     status: newStatus,
-                    table_name: row.table_name,
-                    table_schema: row.table_schema,
-                    webtoken: webToken,
-                    username: row.requestor_username
-                }
+                    requestor_username: row.cells.find(cell => cell.info.header === 'requestor_username').value,
+                    table_name: row.cells.find(cell => cell.info.header === 'table_name').value,
+                    table_schema: row.cells.find(cell => cell.info.header === 'table_schema').value,
+                    webtoken: webToken
+                };
 
                 console.log(row)
 

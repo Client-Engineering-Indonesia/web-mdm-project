@@ -603,7 +603,6 @@ def assign_role(username):
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-
         user_roles = data.get('user_roles')
         webToken = data.get('webtoken')
         if not username or not user_roles or not webToken: 
