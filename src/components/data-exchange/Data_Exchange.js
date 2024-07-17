@@ -51,6 +51,15 @@ function Data_Exchange() {
 
         },
         {
+            table_name: 'BU_A_B_JOINED',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
+            business_name: 'Business Unit 2',
+            request_timestamp: 'Jul 19, 2024 2:22 PM',
+            is_approved: null,
+            is_requested: false,
+
+        },
+        {
             table_name: 'AUDIT',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 1',
