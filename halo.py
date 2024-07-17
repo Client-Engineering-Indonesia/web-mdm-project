@@ -603,7 +603,6 @@ def assign_role(username):
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-
         user_roles = data.get('user_roles')
         webToken = data.get('webtoken')
         if not username or not user_roles or not webToken: 
@@ -706,32 +705,31 @@ def get_business_units_groups():
 
         token = auth_header.split(" ")[1]
 
-        if token["username"] == 'webuser_A' or token["username"] == 'webuser_B': 
-            url = f'{cp4d_url}/usermgmt/v2/groups'
+        url = f'{cp4d_url}/usermgmt/v2/groups'
 
-            headers = {
-                'cache-control': 'no-cache',
-                'content-type': 'application/json',
-                'Authorization': f'Bearer {token}'
-            }
+        headers = {
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'Authorization': f'Bearer {token}'
+        }
 
-            response = requests.get(url, headers=headers, verify=False)
+        response = requests.get(url, headers=headers, verify=False)
 
-            if response.status_code == 200:
-                responseJson = response.json()
-                resultList = []
-                for group in responseJson["results"]:
-                    if (group["name"].lower().startswith("business")):
-                        resultObject = {
-                            "group_name": group["name"],
-                            "group_description": group["description"],
-                            "role": group["roles"],
-                            "active_member": group["members_count"]
-                        }
+        if response.status_code == 200:
+            responseJson = response.json()
+            resultList = []
+            for group in responseJson["results"]:
+                if (group["name"].lower().startswith("business")):
+                    resultObject = {
+                        "group_name": group["name"],
+                        "group_description": group["description"],
+                        "role": group["roles"],
+                        "active_member": group["members_count"]
+                    }
 
-                        resultList.append(resultObject)
+                    resultList.append(resultObject)
 
-                return jsonify({"status": "Success", "data": resultList}), 200
+            return jsonify({"status": "Success", "data": resultList}), 200
         else:
             return jsonify({'error': 'failed', 'details': response.text}), response.status_code
 
@@ -803,7 +801,7 @@ def get_assets_data():
         webtoken = auth_header.split(" ")[1]
         # print(webtoken)
         logged_in_user = decodeJwtToken(webtoken)
-        print(logged_in_user)
+
         table_assets_path = 'src/data/table-assets.json'
         dv_list = []
 
@@ -1116,6 +1114,31 @@ def graph_main(start_date, end_date):
             else:
                 node_data["type"] = "user"
                 node_data['text'] = node
+            
+            if node == 'CPADMIN':
+                node_data['loc'] = '-100 300'
+            elif node == 'BU_A_CUSTOMER':
+                node_data['loc'] = '50 300'
+            elif node == 'HIZKIA.FEBIANTO@IBM.COM':
+                node_data['loc'] = '50 0'
+            elif node == 'ADI.WIJAYA@IBM.COM':
+                node_data['loc'] = "50 460"
+            elif node == 'ACHMAD.FAUZAN@IBM.COM':
+                node_data['loc'] = "250 300"
+            elif node == 'DANENDRA.ATHALLARIQ@IBM.COM':
+                node_data['loc'] = "780 300"
+            elif node == 'BU_A_B_Joined':
+                node_data['loc'] = "780 0"
+            elif node == 'BU_B_CUSTOMER':
+                node_data['loc'] = "500 460"
+            elif node == 'EMPLOYEE':
+                node_data['loc'] = "480 100"
+            elif node == 'HIZKIA_FEB':
+                node_data['loc'] = "280 150"
+            elif node == 'EMPLOYEE_RECORDS':
+                node_data['loc'] = "480 300"
+
+
             node_data_array.append(node_data)
         # Get node edge array
         for i, edge in enumerate(G.edges()):

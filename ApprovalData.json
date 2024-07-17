@@ -97,7 +97,7 @@
     },
     {
         "id": "b3aeca35",
-        "is_approved": false,
+        "is_approved": true,
         "requestor_business_unit": "Business Unit A",
         "requestor_username": "webuser",
         "requestor_role": "Viewer",
@@ -108,7 +108,7 @@
         "description": "desc",
         "table_schema": "schema",
         "request_timestamp": "2024-07-17 20:06:48",
-        "approved_timestamp": null,
+        "approved_timestamp": "2024-07-17 22:49:26",
         "expire_date": "2024-07-18 20:06:48"
     }
 ]
