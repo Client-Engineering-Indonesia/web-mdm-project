@@ -1,19 +1,21 @@
 import './Data_Exchange.css';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Search, Dropdown } from '@carbon/react';
-import axios from 'axios'; // Import Axios
-import { useState, useEffect } from 'react';
+import axios from 'axios';
 import Cookies from 'js-cookie';
 import DataExchangeRequestForm from './DataExchangeRequestForm';
 
 const url = 'http://52.118.170.239:8443';
-// const url = 'http://52.118.170.239:8443';
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState(null);
+    const [filteredItems, setFilteredItems] = useState([]);
+
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
     const items = [
         {
             id: 'option-0',
@@ -26,6 +28,7 @@ function Data_Exchange() {
             tagId: '16'
         },
     ];
+
     const arrayObject = [
         {
             table_name: 'BU_A_CUSTOMER',
@@ -48,60 +51,32 @@ function Data_Exchange() {
             description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
         },
     ];
-    // const [changeButton, setChangeButton] = useState( Array(arrayObject.length).fill(false));
-    // Load button state from cookies
+
     const loadButtonState = () => {
         const savedState = Cookies.get('buttonState');
         return savedState ? JSON.parse(savedState) : Array(arrayObject.length).fill(false);
     };
 
     const [changeButton, setChangeButton] = useState(loadButtonState);
+
     useEffect(() => {
-        // Save button state to cookies whenever it changes
         Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 100000 });
     }, [changeButton]);
 
-    // const onClick = async (index) => {
-    //     const getToken = async () => {
-    //         try {
-    //             const response = await axios.post(`${url1}/get_token`);
-    //             return response.data.token; // Adjust this according to your API response structure
-    //         } catch (error) {
-    //             console.error('Error fetching token:', error);
-    //             throw error;
-    //         }
-    //     }
-    //     const token = await getToken(); // Get the token first
-    //     const headers = {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `Bearer ${token}`
-    //     };
-    //     try {
-    //         if (changeButton[index] === false) {
-    //             const response = await axios.post(`${url1}/grant_access`, {
-    //                 table_name: arrayObject[index].table_name,
-    //             }, { headers });
-    //             console.log('Request successful:', response);
-    //         } else {
-    //             const table_name = arrayObject[index].table_name;
-    //             const table_schema = 'DANENDRA.ATHALLARIQ@IBM.COM';
-    //             const response = await axios.delete(`${url1}/revoke_access/adi.wijaya@ibm.com`, {
-    //                 headers: headers,
-    //                 params: { table_name, table_schema }
-    //             });
-    //             console.log('Revoke successful:', response);
-    //         }
-    //         const newChangeButton = [...changeButton];
-    //         newChangeButton[index] = !newChangeButton[index];
-    //         setChangeButton(newChangeButton);
-    //     } catch (error) {
-    //         console.error('Error making request:', error.response ? error.response.data : error.message);
-    //     }
-    // };
+    useEffect(() => {
+        if (selectedFilter) {
+            setFilteredItems(arrayObject.filter(item => item.business_name === selectedFilter.text));
+        } else {
+            setFilteredItems(arrayObject);
+        }
+    }, [selectedFilter]);
+
+    const handleDropdownChange = (event) => {
+        setSelectedFilter(event.selectedItem);
+    };
 
     return (
         <section className='data-exchange'>
-            {/* categories and vendors */}
             <section className='category-vendor'>
                 <div className='category'>
                     <p className='category-title'>Categories</p>
@@ -116,10 +91,7 @@ function Data_Exchange() {
                     <p>Business Unit 3</p>
                 </div>
             </section>
-            {/* categories and vendors */}
-            {/* content */}
             <section className='data-exchange-content'>
-                {/* product catalog */}
                 <div className='product-catalog'>
                     <div className='title'>
                         <p className='product-catalog-title'>PRODUCT CATALOG</p>
@@ -131,29 +103,23 @@ function Data_Exchange() {
                             <p>All Data Product (1000 Results)</p>
                             <p>Showing 1 of 50</p>
                             <div className='dropdown'>
-                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} />
+                                <Dropdown id="default" items={items} label="Sort By" itemToString={item => item ? item.text : ''} onChange={handleDropdownChange} />
                             </div>
                         </div>
                     </div>
                 </div>
-                {/* product catalog */}
-                {/* request list */}
                 <div className='request-list'>
-                    {arrayObject.map((item, index) => (
+                    {filteredItems.map((item, index) => (
                         <div key={index} className='list-detail'>
                             <p>{item.table_name}</p>
                             <p>{item.business_name}</p>
                             <p>{item.description}</p>
                             {changeButton[index] === false && <Button size='md' onClick={toggleSidebar} className='request-access'>Request Access</Button>}
-                            {changeButton[index] === true && <Button size='md'
-                                // onClick={() => onClick(index)} 
-                                className='request-access'>Revoke</Button>}
+                            {changeButton[index] === true && <Button size='md' className='request-access'>Revoke</Button>}
                         </div>
                     ))}
                 </div>
-                {/* request list */}
             </section>
-            {/* content */}
             <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} />
         </section>
     );
