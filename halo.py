@@ -563,10 +563,10 @@ def assign_role(username):
 
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-
+        print(data)
         user_roles = data.get('user_roles')
-
-        if not username or not user_roles:
+        webToken = data.get('webtoken')
+        if not username or not user_roles or not webToken: 
             return jsonify({'error': 'Missing required parameters'}), 400
 
         user_info = decodeJwtToken(data.get('web_token'))
@@ -592,7 +592,7 @@ def assign_role(username):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+        
 # Get User Info
 @app.route('/user_info', methods=['POST'])
 def get_user_info_from_jwt():
