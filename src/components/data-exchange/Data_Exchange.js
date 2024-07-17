@@ -28,6 +28,20 @@ function Data_Exchange() {
     ];
     const arrayObject = [
         {
+            table_name: 'BU_A_CUSTOMER',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
+            business_name: 'Business Unit 1',
+            request_timestamp: 'Jul 19, 2024 2:14 PM',
+            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
+        {
+            table_name: 'BU_B_CUSTOMER',
+            table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
+            business_name: 'Business Unit 2',
+            request_timestamp: 'Jul 19, 2024 2:14 PM',
+            description: 'Data set of car sales from 2023 to 2024. cleansed and parsed'
+        },
+        {
             table_name: 'AUDIT',
             table_schema: 'DANENDRA.ATHALLARIQ@IBM.COM',
             business_name: 'Business Unit 1',
@@ -73,7 +87,7 @@ function Data_Exchange() {
     const [changeButton, setChangeButton] = useState(loadButtonState);
     useEffect(() => {
         // Save button state to cookies whenever it changes
-        Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 100000 });
+        Cookies.set('buttonState', JSON.stringify(changeButton), { expires: 10000 });
     }, [changeButton]);
 
     // const onClick = async (index) => {
