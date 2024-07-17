@@ -1,7 +1,7 @@
 [
     {
         "id": "bd4a77d1",
-        "is_approved": false,
+        "is_approved": true,
         "requestor_business_unit": "BU A",
         "requestor_username": "user",
         "requestor_role": "Viewer",
@@ -12,12 +12,12 @@
         "description": "test",
         "table_schema": "DANENDRA.ATHALLARIQ@IBM.COM",
         "request_timestamp": "2024-07-14 19:50:18",
-        "approved_timestamp": null,
+        "approved_timestamp": "2024-07-17 19:17:00",
         "expire_date": "2024-07-31 00.00.00"
     },
     {
         "id": "d99fea48",
-        "is_approved": true,
+        "is_approved": false,
         "requestor_business_unit": "Business Unit A Group",
         "requestor_username": "steward BU A",
         "requestor_role": "Viewer",
@@ -28,12 +28,12 @@
         "description": "desc",
         "table_schema": "DANENDRA.ATHALLARIQ@IBM.COM",
         "request_timestamp": "2024-07-15 21:11:30",
-        "approved_timestamp": "2024-07-15 22:15:20",
+        "approved_timestamp": "2024-07-17 19:14:58",
         "expire_date": "1"
     },
     {
         "id": "989f335d",
-        "is_approved": true,
+        "is_approved": false,
         "requestor_business_unit": "Business Unit A Group",
         "requestor_username": "steward BU A",
         "requestor_role": "Viewer",
@@ -49,7 +49,7 @@
     },
     {
         "id": "6e0d49c6",
-        "is_approved": false,
+        "is_approved": true,
         "requestor_business_unit": "Business Unit A Group",
         "requestor_username": "user",
         "requestor_role": "Viewer",
@@ -60,12 +60,12 @@
         "description": "test",
         "table_schema": "DANENDRA.ATHALLARIQ@IBM.COM",
         "request_timestamp": "2024-07-16 15:17:53",
-        "approved_timestamp": null,
+        "approved_timestamp": "2024-07-17 19:14:40",
         "expire_date": "2024-07-17 15:17:53"
     },
     {
         "id": "c1fb77b3",
-        "is_approved": false,
+        "is_approved": true,
         "requestor_business_unit": "Business Unit A Group",
         "requestor_username": "test",
         "requestor_role": "Viewer",
@@ -76,7 +76,7 @@
         "description": "testing ",
         "table_schema": "test@mail.com",
         "request_timestamp": "2024-07-16 16:50:43",
-        "approved_timestamp": null,
+        "approved_timestamp": "2024-07-17 18:52:19",
         "expire_date": "2024-07-17 16:50:43"
     }
 ]
