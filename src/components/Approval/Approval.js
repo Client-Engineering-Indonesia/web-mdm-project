@@ -82,7 +82,7 @@ const Approval = () => {
     }, []);
 
 
-    const handleActionClick = (row, action) => {
+    const handleActionClick = (row, action, data) => {
         if (action === 'approve' || action === 'reject') {
             const confirmMessage = action === 'approve' ? 'Approve this request?' : 'Reject this request?';
             if (window.confirm(confirmMessage)) {
@@ -92,8 +92,11 @@ const Approval = () => {
                     status: newStatus,
                     table_name: row.table_name,
                     table_schema: row.table_schema,
-                    webtoken: webToken
+                    webtoken: webToken,
+                    username: row.requestor_username
                 }
+
+                console.log(row)
 
                 axios.put(`${url}/update_approval_status/${row.id}`, body)
                     .then(response => {
