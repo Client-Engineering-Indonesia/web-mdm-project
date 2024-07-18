@@ -1,7 +1,7 @@
 [
     {
         "id": "9ad9fcda",
-        "is_approved": true,
+        "is_approved": false,
         "requestor_business_unit": "Business Unit A",
         "requestor_username": "user_bu_a",
         "requestor_role": "Viewer",
@@ -14,5 +14,21 @@
         "request_timestamp": "2024-07-18 17:46:53",
         "approved_timestamp": "2024-07-18 17:47:09",
         "expire_date": "2024-07-19 17:46:53"
+    },
+    {
+        "id": "06e0daca",
+        "is_approved": true,
+        "requestor_business_unit": "Business Unit A",
+        "requestor_username": "user_bu_a",
+        "requestor_role": "Viewer",
+        "table_name": "BU_B_CUSTOMER",
+        "owner_email": "owner@mail.com",
+        "owner_name": "owner",
+        "owner_phone": "123",
+        "description": "desc",
+        "table_schema": "ADMIN",
+        "request_timestamp": "2024-07-18 18:16:06",
+        "approved_timestamp": "2024-07-18 18:16:20",
+        "expire_date": "2024-07-19 18:16:06"
     }
 ]

@@ -12,6 +12,7 @@ function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState(null);
     const [filteredItems, setFilteredItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -64,6 +65,7 @@ function Data_Exchange() {
             console.log(response);
             console.log(response.data.data);
             setData(response.data.data);
+            setIsLoading(false);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -128,7 +130,11 @@ function Data_Exchange() {
     // };
 
     return (
-        <section className='data-exchange'>
+        <>
+            {isLoading && <div><h1>Loading data...</h1></div>}
+            {!isLoading && <section className='data-exchange'>
+            
+            
             <section className='category-vendor'>
                 <div className='category'>
                     <p className='category-title'>Categories</p>
@@ -178,7 +184,8 @@ function Data_Exchange() {
                 </div>
             </section>
             {/* <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} onSubmit={() => handleSubmission(index)}/> */}
-        </section>
+        </section>}
+        </>
     );
 }
 
