@@ -38,29 +38,10 @@ function Data_Exchange() {
         },
     ];
 
-    const data = [
-        {
-            table_name: 'BU_A_CUSTOMER',
-            table_schema: 'Admin',
-            type: 'Table',
-            virtualization_status: 'Success',
-            created_on: 'Jul 18, 2024 1:13 PM',
-            is_approved: true,
-            is_requested: true
-        },
-        {
-            table_name: 'BU_B_CUSTOMER',
-            table_schema: 'Admin',
-            type: 'Table',
-            virtualization_status: 'Success',
-            created_on: 'Jul 18, 2024 1:13 PM',
-            is_approved: false,
-            is_requested: false
-        },
-    ];
+    
     
 
-    // const [data, setData] = useState([]);
+    const [data, setData] = useState([]);
     const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
     const [decodedUsername, setDecodedUsername] = useState('');
 
@@ -76,7 +57,7 @@ function Data_Exchange() {
             setDecodedUsername(decoded.username);
             // You can also store other decoded information as needed
         }
-        // fetchData();
+        fetchData();
     }, []);
 
     const fetchData = async () => {
