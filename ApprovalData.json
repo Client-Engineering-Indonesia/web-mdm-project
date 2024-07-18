@@ -78,5 +78,21 @@
         "request_timestamp": "2024-07-18 21:18:50",
         "approved_timestamp": null,
         "expire_date": "2024-07-19 21:18:50"
+    },
+    {
+        "id": "93b6ef13",
+        "is_approved": false,
+        "requestor_business_unit": "Business Unit A",
+        "requestor_username": "steward_bu_a",
+        "requestor_role": "Viewer",
+        "table_name": "BU_A_CUSTOMER",
+        "owner_email": "owner@mail.com",
+        "owner_name": "owner",
+        "owner_phone": "123",
+        "description": "123",
+        "table_schema": "ADMIN",
+        "request_timestamp": "2024-07-18 21:27:02",
+        "approved_timestamp": null,
+        "expire_date": "2024-07-19 21:27:02"
     }
 ]
