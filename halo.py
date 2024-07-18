@@ -842,7 +842,6 @@ def get_assets_data():
                 approval_data = json.load(file)
                 resultList = []
                 for asset in dv_list:
-                    print(asset)
                     current_data = {
                                 "table_name": asset["table_name"],
                                 "table_schema": asset["table_schema"]
@@ -879,7 +878,6 @@ def get_approval_data():
 def update_approval_status(id):
     try:
         user_request = request.get_json()
-        print(user_request)
         new_status = user_request.get('status')
         current_time = datetime.now()
         user_info = decodeJwtToken(user_request.get('webtoken'))
@@ -899,9 +897,30 @@ def update_approval_status(id):
         
         request_id = user_request.get("id")
         table_name = user_request.get('table_name')
-        authid = user_request.get('username')
+        authid = user_request.get('requestor_username')
         table_schema = user_request.get('table_schema')
 
+        cpadmin_username = os.getenv('username')
+        cpadmin_password = os.getenv('password')
+        data = {
+            'username': cpadmin_username,
+            'password': cpadmin_password
+        }
+        print(data)
+        
+        headers = {
+            'content-type': 'application/json'
+        }
+        cpadmin_auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
+        cpadmin_cp4d_token = cpadmin_auth_response.json().get('token')
+
+        ## Get DV table
+        cpadmin_cp4d_headers = {
+                'cache-control': 'no-cache',
+                'content-type': 'application/json',
+                'Authorization': f'Bearer {cpadmin_cp4d_token}'
+            }
+        
         token = user_info.get('cp4d_token')
         url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
 
@@ -916,7 +935,8 @@ def update_approval_status(id):
         }
 
         print(payload)
-        access_response = requests.post(url, headers=headers, data=json.dumps(payload), verify=False)
+        access_response = requests.post(url, headers=cpadmin_cp4d_headers, data=json.dumps(payload), verify=False)
+        print(access_response)
 
         if access_response.status_code == 200:
             with open(file_path, 'r') as file:
@@ -1115,10 +1135,37 @@ def graph_main(start_date, end_date):
             x, y = nodes_positions[node]
             node_data = {"key":node}
             node_data["loc"] = f"{x} {y}"
+
             if node in VIRTUALIZED_DATA:
                 node_data['text'] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
+                node_data['type'] = "database"
             else:
+                node_data["type"] = "user"
                 node_data['text'] = node
+            
+            if node == 'CPADMIN':
+                node_data['loc'] = '-100 300'
+            elif node == 'BU_A_CUSTOMER':
+                node_data['loc'] = '50 300'
+            elif node == 'HIZKIA.FEBIANTO@IBM.COM':
+                node_data['loc'] = '50 0'
+            elif node == 'ADI.WIJAYA@IBM.COM':
+                node_data['loc'] = "50 460"
+            elif node == 'ACHMAD.FAUZAN@IBM.COM':
+                node_data['loc'] = "250 300"
+            elif node == 'DANENDRA.ATHALLARIQ@IBM.COM':
+                node_data['loc'] = "780 300"
+            elif node == 'BU_A_B_Joined':
+                node_data['loc'] = "780 0"
+            elif node == 'BU_B_CUSTOMER':
+                node_data['loc'] = "500 460"
+            elif node == 'EMPLOYEE':
+                node_data['loc'] = "480 100"
+            elif node == 'HIZKIA_FEB':
+                node_data['loc'] = "280 150"
+            elif node == 'EMPLOYEE_RECORDS':
+                node_data['loc'] = "480 300"
+
             node_data_array.append(node_data)
         # Get node edge array
         for i, edge in enumerate(G.edges()):
