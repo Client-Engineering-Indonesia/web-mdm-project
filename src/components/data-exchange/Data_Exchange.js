@@ -12,8 +12,8 @@ const url = 'http://127.0.0.1:5000';
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState(null);
-    const [filteredItems, setFilteredItems] = useState([]);
+    // const [selectedFilter, setSelectedFilter] = useState(null);
+    // const [filteredItems, setFilteredItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const toggleSidebar = () => {
@@ -37,9 +37,6 @@ function Data_Exchange() {
             tagId: '17'
         },
     ];
-
-    
-    
 
     const [data, setData] = useState([]);
     const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
@@ -187,13 +184,19 @@ function Data_Exchange() {
                             <p>Virtualization Status: {item.virtualization_status}</p>
                             <p>Created On: {item.created_on}</p>
                             {/* <p>{decodedUsername}</p> */}
-                            <p>{index}</p>
-                            <ButtonComponent 
-                                item={item} 
-                                index={index} 
-                                submissionStatus={submissionStatus} 
-                                toggleSidebar={toggleSidebar} 
-                            />
+                            {/* <p>{index}</p> */}
+                            {item.is_approved && item.is_requested &&
+                            <Button kind="primary" onClick={toggleSidebar} >
+                                Revoke
+                            </Button>}
+                            {!item.is_approved && item.is_requested &&
+                            <Button kind="disabled" onClick={toggleSidebar} >
+                                Pending Approval
+                            </Button>}
+                            {!item.is_approved && !item.is_requested &&
+                            <Button kind="primary" onClick={toggleSidebar} >
+                                Request Access
+                            </Button>}
                             <DataExchangeRequestForm
                                 isOpen={isSidebarOpen}
                                 onClose={toggleSidebar}
