@@ -17,7 +17,7 @@
     },
     {
         "id": "06e0daca",
-        "is_approved": true,
+        "is_approved": false,
         "requestor_business_unit": "Business Unit A",
         "requestor_username": "user_bu_a",
         "requestor_role": "Viewer",

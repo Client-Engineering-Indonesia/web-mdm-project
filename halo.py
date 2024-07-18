@@ -842,7 +842,6 @@ def get_assets_data():
                 approval_data = json.load(file)
                 resultList = []
                 for asset in dv_list:
-                    print(asset)
                     current_data = {
                                 "table_name": asset["table_name"],
                                 "table_schema": asset["table_schema"]
@@ -904,6 +903,7 @@ def update_approval_status(id):
             'password': cpadmin_password
         }
         print(data)
+        
         headers = {
             'content-type': 'application/json'
         }
@@ -915,6 +915,7 @@ def update_approval_status(id):
                 'content-type': 'application/json',
                 'Authorization': f'Bearer {cpadmin_cp4d_token}'
             }
+        
         token = user_info.get('cp4d_token')
         url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
         headers = {
@@ -1124,10 +1125,37 @@ def graph_main(start_date, end_date):
             x, y = nodes_positions[node]
             node_data = {"key":node}
             node_data["loc"] = f"{x} {y}"
+
             if node in VIRTUALIZED_DATA:
                 node_data['text'] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
+                node_data['type'] = "database"
             else:
+                node_data["type"] = "user"
                 node_data['text'] = node
+            
+            if node == 'CPADMIN':
+                node_data['loc'] = '-100 300'
+            elif node == 'BU_A_CUSTOMER':
+                node_data['loc'] = '50 300'
+            elif node == 'HIZKIA.FEBIANTO@IBM.COM':
+                node_data['loc'] = '50 0'
+            elif node == 'ADI.WIJAYA@IBM.COM':
+                node_data['loc'] = "50 460"
+            elif node == 'ACHMAD.FAUZAN@IBM.COM':
+                node_data['loc'] = "250 300"
+            elif node == 'DANENDRA.ATHALLARIQ@IBM.COM':
+                node_data['loc'] = "780 300"
+            elif node == 'BU_A_B_Joined':
+                node_data['loc'] = "780 0"
+            elif node == 'BU_B_CUSTOMER':
+                node_data['loc'] = "500 460"
+            elif node == 'EMPLOYEE':
+                node_data['loc'] = "480 100"
+            elif node == 'HIZKIA_FEB':
+                node_data['loc'] = "280 150"
+            elif node == 'EMPLOYEE_RECORDS':
+                node_data['loc'] = "480 300"
+
             node_data_array.append(node_data)
         # Get node edge array
         for i, edge in enumerate(G.edges()):
