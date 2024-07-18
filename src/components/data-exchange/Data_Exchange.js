@@ -37,9 +37,6 @@ function Data_Exchange() {
         },
     ];
 
-    
-    
-
     const [data, setData] = useState([]);
     const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
     const [decodedUsername, setDecodedUsername] = useState('');
