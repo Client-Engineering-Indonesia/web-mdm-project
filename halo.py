@@ -1055,10 +1055,10 @@ def create_new_endpoint():
         return jsonify({'error': str(e)}), 500
 
 #Data Constant
-DV_DATA_EXCHANGE_DF = pd.read_csv('src/data/dv_log_processed.csv')
+DV_DATA_EXCHANGE_DF = pd.read_csv('dv_log_processed.csv')
 DV_DATA_EXCHANGE_DF['eventTime'] = pd.to_datetime(DV_DATA_EXCHANGE_DF['eventTime']).dt.date
-VIEW_DF = pd.read_csv('src/data/table_access_log.csv')
-TABLE_ACCESS_COUNT = VIEW_DF['table_accessed'].value_counts()
+VIEW_DF = pd.read_csv('table_access_log.csv')
+VIEW_DF['eventTime'] = pd.to_datetime(VIEW_DF['eventTime']).dt.date
 VIRTUALIZED_DATA = DV_DATA_EXCHANGE_DF["dv_table_name"].unique()
 #Graph Creation
 def graph_main(start_date, end_date):
@@ -1077,10 +1077,10 @@ def graph_main(start_date, end_date):
             (df['eventTime']<=end_date)
         ]
         return df
-    def create_graph(dv_data_exchange_df, table_access_count):
+    def create_graph(dv_data_exchange_df, view_df):
         # Create a directed graph
         G = nx.DiGraph()
-
+        table_access_count = view_df['table_accessed'].value_counts()
         # Process the DataFrame to add or remove edges based on actions
         for index, row in dv_data_exchange_df.iterrows():
             table = row['dv_table_name']
@@ -1108,37 +1108,11 @@ def graph_main(start_date, end_date):
         for node in G.nodes():
             x, y = nodes_positions[node]
             node_data = {"key":node}
+            node_data["loc"] = f"{x} {y}"
             if node in VIRTUALIZED_DATA:
                 node_data['text'] = f"{node}\nAccess Count: {G.nodes[node]['access_count']}"
-                node_data['type'] = "database"
             else:
-                node_data["type"] = "user"
                 node_data['text'] = node
-            
-            if node == 'CPADMIN':
-                node_data['loc'] = '-100 300'
-            elif node == 'BU_A_CUSTOMER':
-                node_data['loc'] = '50 300'
-            elif node == 'HIZKIA.FEBIANTO@IBM.COM':
-                node_data['loc'] = '50 0'
-            elif node == 'ADI.WIJAYA@IBM.COM':
-                node_data['loc'] = "50 460"
-            elif node == 'ACHMAD.FAUZAN@IBM.COM':
-                node_data['loc'] = "250 300"
-            elif node == 'DANENDRA.ATHALLARIQ@IBM.COM':
-                node_data['loc'] = "780 300"
-            elif node == 'BU_A_B_Joined':
-                node_data['loc'] = "780 0"
-            elif node == 'BU_B_CUSTOMER':
-                node_data['loc'] = "500 460"
-            elif node == 'EMPLOYEE':
-                node_data['loc'] = "480 100"
-            elif node == 'HIZKIA_FEB':
-                node_data['loc'] = "280 150"
-            elif node == 'EMPLOYEE_RECORDS':
-                node_data['loc'] = "480 300"
-
-
             node_data_array.append(node_data)
         # Get node edge array
         for i, edge in enumerate(G.edges()):
@@ -1147,7 +1121,8 @@ def graph_main(start_date, end_date):
             link_data_array.append(edge_data)
         return node_data_array, link_data_array
     df = filter_df(start_date, end_date, DV_DATA_EXCHANGE_DF)
-    G = create_graph(df, TABLE_ACCESS_COUNT)
+    view_df = filter_df(start_date, end_date, VIEW_DF)
+    G = create_graph(df, view_df)
     return post_process_graph(G)
 
 @app.route('/create_graph', methods=['POST'])
