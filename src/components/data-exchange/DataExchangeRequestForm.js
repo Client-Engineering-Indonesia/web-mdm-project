@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'
 
 // const url = 'http://127.0.0.1:5000';
 const url = 'http://127.0.0.1:5000';
 
-const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
+const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName, data, decodedUsername }) => {
+  // console.log(decodedUsername);
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
-    requestor_username: '',
+    requestor_username: {decodedUsername},
     requestor_role: 'Viewer',
     table_name: '', // table name
     owner_email: '',
@@ -30,6 +32,8 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
       }));
     }
   }, [isOpen, tableName]);
+  
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,6 +49,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
     return newErrors;
   };
 
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const validationErrors = validateForm();
@@ -52,10 +57,12 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
       setErrors(validationErrors);
     } else {
       const webToken = Cookies.get('web_token');
+      // console.log(webToken);
+
 
       const requestData = {
         requestor_business_unit: formData.requestor_business_unit,
-        requestor_username: formData.requestor_username,
+        requestor_username: decodedUsername,
         requestor_role: formData.requestor_role,
         table_name: tableName,
         owner_email: formData.owner_email,
@@ -63,7 +70,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
         owner_phone: formData.owner_phone,
         description: formData.description,
         duration: formData.duration,
-        table_schema: formData.table_schema,
+        table_schema: data.table_schema,
         webtoken: webToken,
       };
 
@@ -110,15 +117,15 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
                 invalid={!!errors.requestor_business_unit}
                 invalidText={errors.requestor_business_unit}
               />
-              <TextInput
+              {/* <TextInput
                 id="requestor-username"
                 labelText={<span style={{ color: 'white' }}>Requestor Name</span>}
                 name="requestor_username"
-                value={formData.requestor_username}
+                value={decodedUsername}
                 onChange={handleChange}
                 invalid={!!errors.requestor_username}
                 invalidText={errors.requestor_username}
-              />
+              /> */}
               <TextInput
                 id="owner-email"
                 labelText={<span style={{ color: 'white' }}>Owner Email</span>}
@@ -158,13 +165,13 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
                 invalidText={errors.duration}
                 type="number"
               />
-              <TextInput 
+              {/* <TextInput 
                 id="table-schema"
                 labelText={<span style={{ color: 'white' }}>Table Schema</span>}
                 name="table_schema"
                 value={formData.table_schema}
                 onChange={handleChange}
-              />
+              /> */}
               <div>
                 <Button type="button" onClick={onClose} kind="secondary" style={{ width: '10rem' }}>Cancel</Button>
                 <Button type="submit" style={{ marginLeft: '2.5rem', width: '10rem' }}>Request</Button>

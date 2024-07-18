@@ -881,11 +881,9 @@ def update_approval_status(id):
         new_status = user_request.get('status')
         current_time = datetime.now()
         user_info = decodeJwtToken(user_request.get('webtoken'))
-        
         # if 'role' in user_info and 'admin' not in user_info["role"].lower():
         #     return jsonify({'error': 'You do not have permission to approve this request'}), 400
-    
-        # else: 
+        # else:
         data = load_data()
         updated = False
         for entry in data:
@@ -894,12 +892,10 @@ def update_approval_status(id):
                 entry['approved_timestamp'] = current_time.strftime("%Y-%m-%d %H:%M:%S")
                 updated = True
                 break
-        
         request_id = user_request.get("id")
         table_name = user_request.get('table_name')
         authid = user_request.get('requestor_username')
         table_schema = user_request.get('table_schema')
-
         cpadmin_username = os.getenv('username')
         cpadmin_password = os.getenv('password')
         data = {
@@ -913,7 +909,6 @@ def update_approval_status(id):
         }
         cpadmin_auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
         cpadmin_cp4d_token = cpadmin_auth_response.json().get('token')
-
         ## Get DV table
         cpadmin_cp4d_headers = {
                 'cache-control': 'no-cache',
@@ -923,7 +918,6 @@ def update_approval_status(id):
         
         token = user_info.get('cp4d_token')
         url = f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/users'
-
         headers = {
             'content-type': 'application/json',
             'Authorization': f'Bearer {token}'
@@ -933,28 +927,24 @@ def update_approval_status(id):
             "table_schema": table_schema,
             "authid": authid
         }
-
         print(payload)
         access_response = requests.post(url, headers=cpadmin_cp4d_headers, data=json.dumps(payload), verify=False)
         print(access_response)
-
         if access_response.status_code == 200:
             with open(file_path, 'r') as file:
                 data = json.load(file)
-
             found = False
             for item in data:
-                if item["id"] == request_id:
+                print(item)
+                if item["id"] == id:
                     item["is_approved"] = True
                     item["approved_timestamp"] = current_timestamp()
                     found = True
-                    
         if updated:
             save_data(data)
             return jsonify({'message': f'Status updated for ID {id}'}), 200
         else:
             return jsonify({'error': f'ID {id} not found'}), 404
-
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     

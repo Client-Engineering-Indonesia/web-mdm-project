@@ -79,6 +79,10 @@ const Approval = () => {
     // Call fetchData in useEffect
     useEffect(() => {
         fetchData();
+        // auto refresh when data is updated
+        // const interval = setInterval(() => {
+        //     fetchData();
+        // }, 5000);
     }, []);
 
 
