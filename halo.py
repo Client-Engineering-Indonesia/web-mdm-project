@@ -801,25 +801,29 @@ def get_assets_data():
         webtoken = auth_header.split(" ")[1]
         # print(webtoken)
         logged_in_user = decodeJwtToken(webtoken)
+        # print(logged_in_user)
 
         table_assets_path = 'src/data/table-assets.json'
         dv_list = []
 
         # Check if the user is a dummy user
         if logged_in_user['username'] in dummy_users:
-            # print("halo")
+            print("halo")
             with open(table_assets_path, 'r') as file:
                 dv_list = json.load(file)["objects"]
 
         else:
+            print("else")
             cpadmin_username = os.getenv('username')
             cpadmin_password = os.getenv('password')
             data = {
                 'username': cpadmin_username,
                 'password': cpadmin_password
             }
+            print(data)
+            
             headers = {
-                'Content-Type': 'application/json'
+                'content-type': 'application/json'
             }
             cpadmin_auth_response = requests.post(f'{cp4d_url}/icp4d-api/v1/authorize', headers=headers, json=data)
             cpadmin_cp4d_token = cpadmin_auth_response.json().get('token')
@@ -830,7 +834,7 @@ def get_assets_data():
                     'content-type': 'application/json',
                     'Authorization': f'Bearer {cpadmin_cp4d_token}'
                 }
-            dv_api_response = requests.post(f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/tables?rolename=DV_ADMIN', headers=cpadmin_cp4d_headers)
+            dv_api_response = requests.get(f'{cp4d_url}/icp4data-databases/dv/cpd/dvapiserver/v2/privileges/tables?rolename=DV_ADMIN', headers=cpadmin_cp4d_headers)
             dv_list = dv_api_response.json().get('objects')
         
         # Open file path data
@@ -838,12 +842,14 @@ def get_assets_data():
                 approval_data = json.load(file)
                 resultList = []
                 for asset in dv_list:
+                    print(asset)
                     current_data = {
                                 "table_name": asset["table_name"],
                                 "table_schema": asset["table_schema"]
                             }
                     found = False
                     for data in approval_data:
+                        print(data)
                         if asset["table_name"] == data["table_name"] and data["requestor_username"] == logged_in_user['username']:
                             found = True
                             current_data["is_approved"] = data["is_approved"]

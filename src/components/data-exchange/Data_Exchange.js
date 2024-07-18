@@ -12,8 +12,9 @@ const url = 'http://127.0.0.1:5000';
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    // const [selectedFilter, setSelectedFilter] = useState(null);
-    // const [filteredItems, setFilteredItems] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState(null);
+    const [filteredItems, setFilteredItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -78,25 +79,26 @@ function Data_Exchange() {
         // fetchData();
     }, []);
 
-    // const fetchData = async () => {
-    //     try {
-    //         const token = isToken;
-    //         const response = await axios.get(`${url}/get_assets`, {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${token}`
-    //             },
-    //             params: {
-    //                 webtoken: token
-    //             }
-    //         });
-    //         console.log(response);
-    //         console.log(response.data.data);
-    //         setData(response.data.data);
-    //     } catch (error) {
-    //         console.error('Error:', error);
-    //     }
-    // };
+    const fetchData = async () => {
+        try {
+            const token = isToken;
+            const response = await axios.get(`${url}/get_assets`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                params: {
+                    webtoken: token
+                }
+            });
+            console.log(response);
+            console.log(response.data.data);
+            setData(response.data.data);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
     
     // State to track the submission status of each item
     const [submissionStatus, setSubmissionStatus] = useState(
@@ -158,7 +160,11 @@ function Data_Exchange() {
     // };
 
     return (
-        <section className='data-exchange'>
+        <>
+            {isLoading && <div><h1>Loading data...</h1></div>}
+            {!isLoading && <section className='data-exchange'>
+            
+            
             <section className='category-vendor'>
                 <div className='category'>
                     <p className='category-title'>Categories</p>
@@ -214,14 +220,15 @@ function Data_Exchange() {
                                 data= {item}
                                 // pass the decodeUsername into child
                                 decodedUsername={decodedUsername}
+                                tableName={item.table_name}
                             />
                         </div>
                     ))}
                 </div>
             </section>
             {/* <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} onSubmit={() => handleSubmission(index)}/> */}
-
-        </section>
+        </section>}
+        </>
     );
 }
 
