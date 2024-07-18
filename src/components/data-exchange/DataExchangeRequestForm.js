@@ -3,10 +3,10 @@ import './RequestForm.css';
 import { Form, Stack, TextInput, TextArea, Button } from '@carbon/react';
 import Cookies from 'js-cookie';
 
-// const url = 'http://52.118.170.239:8443';
-const url = 'http://52.118.170.239:8443';
+// const url = 'http://127.0.0.1:5000';
+const url = 'http://127.0.0.1:5000';
 
-const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
+const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
     requestor_username: '',
@@ -82,6 +82,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, tableName }) => {
 
         const responseData = await response.json();
         console.log('Response from server:', responseData);
+        onSubmit(); 
         onClose();
       } catch (error) {
         console.error('Error submitting form:', error);
