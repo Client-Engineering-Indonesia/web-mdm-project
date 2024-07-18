@@ -171,6 +171,7 @@ function Data_Exchange() {
                                 isOpen={isSidebarOpen}
                                 onClose={toggleSidebar}
                                 onSubmit={() => handleSubmission(index)}
+                                tableName={item.table_name}
                             />
                         </div>
                     ))}

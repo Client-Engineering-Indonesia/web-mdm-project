@@ -57,7 +57,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName }) => {
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: formData.requestor_username,
         requestor_role: formData.requestor_role,
-        table_name: formData.table_name,
+        table_name: tableName,
         owner_email: formData.owner_email,
         owner_name: formData.owner_name,
         owner_phone: formData.owner_phone,
