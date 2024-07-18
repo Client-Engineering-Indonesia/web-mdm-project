@@ -80,9 +80,9 @@ const Approval = () => {
     useEffect(() => {
         fetchData();
         // auto refresh when data is updated
-        const interval = setInterval(() => {
-            fetchData();
-        }, 5000);
+        // const interval = setInterval(() => {
+        //     fetchData();
+        // }, 5000);
     }, []);
 
 
