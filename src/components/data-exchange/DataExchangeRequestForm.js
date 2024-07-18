@@ -8,7 +8,7 @@ import { jwtDecode } from 'jwt-decode'
 const url = 'http://127.0.0.1:5000';
 
 const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName, data, decodedUsername }) => {
-  // console.log(decodedUsername);
+  console.log(data);
   const [formData, setFormData] = useState({
     requestor_business_unit: '',
     requestor_username: {decodedUsername},
@@ -64,7 +64,7 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName, data, d
         requestor_business_unit: formData.requestor_business_unit,
         requestor_username: decodedUsername,
         requestor_role: formData.requestor_role,
-        table_name: tableName,
+        table_name: data.table_name,
         owner_email: formData.owner_email,
         owner_name: formData.owner_name,
         owner_phone: formData.owner_phone,
@@ -72,7 +72,8 @@ const DataExchangeRequestForm = ({ isOpen, onClose, onSubmit, tableName, data, d
         duration: formData.duration,
         table_schema: data.table_schema,
         webtoken: webToken,
-      };
+      }; 
+      console.log(data)
 
       try {
         const response = await fetch(`${url}/create_request`, {

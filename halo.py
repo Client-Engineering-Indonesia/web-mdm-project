@@ -848,8 +848,9 @@ def get_assets_data():
                             }
                     found = False
                     for data in approval_data:
-                        print(data)
                         if asset["table_name"] == data["table_name"] and data["requestor_username"] == logged_in_user['username']:
+                            print(asset)
+                            print(data)
                             found = True
                             current_data["is_approved"] = data["is_approved"]
                             current_data["is_requested"] = True

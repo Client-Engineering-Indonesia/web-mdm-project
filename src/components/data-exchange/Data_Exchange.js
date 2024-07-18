@@ -12,13 +12,12 @@ const url = 'http://127.0.0.1:5000';
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState(null);
-    const [filteredItems, setFilteredItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [sidebarOpenIndex, setSidebarOpenIndex] = useState(null);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    // const toggleSidebar = () => {
+    //     setIsSidebarOpen(!isSidebarOpen);
+    // };
 
     const items = [
         {
@@ -75,12 +74,13 @@ function Data_Exchange() {
             console.log(response);
             console.log(response.data.data);
             setData(response.data.data);
+            console.log(data)
             setIsLoading(false);
         } catch (error) {
             console.error('Error:', error);
         }
     };
-    
+
     // State to track the submission status of each item
     const [submissionStatus, setSubmissionStatus] = useState(
         data.map(() => false)
@@ -127,6 +127,14 @@ function Data_Exchange() {
         );
     };
 
+
+    const toggleSidebar = (index) => {
+        if (sidebarOpenIndex === index) {
+          setSidebarOpenIndex(null);
+        } else {
+          setSidebarOpenIndex(index);
+        }
+      };
 
     // useEffect(() => {
     //     if (selectedFilter) {
@@ -179,33 +187,40 @@ function Data_Exchange() {
                     </div>
                 </div>
                 <div className='request-list'>
-                    {Array.isArray(data) && data.map((item, index) => (
+                    {data.map((item, index) => (
                         <div key={index} className='list-detail'>
-                            <p>Table Name: {item.table_name}</p>
-                            <p>Table Schema: {item.table_schema}</p>
-                            <p>Type: {item.type}</p>
-                            <p>Virtualization Status: {item.virtualization_status}</p>
-                            <p>Created On: {item.created_on}</p>
-                            {/* <p>{decodedUsername}</p> */}
-                            <p>{index}</p>
-                            <ButtonComponent 
-                                item={item} 
-                                index={index} 
-                                submissionStatus={submissionStatus} 
-                                toggleSidebar={toggleSidebar} 
-                            />
+                        <p>Table Name: {item.table_name}</p>
+                        <p>Table Schema: {item.table_schema}</p>
+                        <p>Type: {item.type}</p>
+                        <p>Virtualization Status: {item.virtualization_status}</p>
+                        <p>Created On: {item.created_on}</p>
+                        <p>{index}</p>
+                        {item.is_approved && item.is_requested && 
+                            <Button kind="primary" onClick={() => toggleSidebar(index)}>
+                            Revoke
+                            </Button>}
+                        {!item.is_approved && item.is_requested && 
+                            <Button kind="disabled" onClick={() => toggleSidebar(index)}>
+                            Pending Approval
+                            </Button>}
+                        {!item.is_approved && !item.is_requested && 
+                            <Button kind="primary" onClick={() => toggleSidebar(index)}>
+                            Request Access
+                            </Button>}
+                        
+                        {sidebarOpenIndex === index && (
                             <DataExchangeRequestForm
-                                isOpen={isSidebarOpen}
-                                onClose={toggleSidebar}
-                                onSubmit={() => handleSubmission(index)}
-                                data= {item}
-                                // pass the decodeUsername into child
-                                decodedUsername={decodedUsername}
-                                tableName={item.table_name}
+                            isOpen={true}
+                            onClose={() => toggleSidebar(index)}
+                            onSubmit={() => handleSubmission(index)}
+                            data={item}
+                            decodedUsername={decodedUsername}
+                            tableName={item.table_name}
                             />
+                        )}
                         </div>
                     ))}
-                </div>
+                    </div>
             </section>
             {/* <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} onSubmit={() => handleSubmission(index)}/> */}
         </section>}
