@@ -1055,9 +1055,9 @@ def create_new_endpoint():
         return jsonify({'error': str(e)}), 500
 
 #Data Constant
-DV_DATA_EXCHANGE_DF = pd.read_csv('dv_log_processed.csv')
+DV_DATA_EXCHANGE_DF = pd.read_csv('src/data/dv_log_processed.csv')
 DV_DATA_EXCHANGE_DF['eventTime'] = pd.to_datetime(DV_DATA_EXCHANGE_DF['eventTime']).dt.date
-VIEW_DF = pd.read_csv('table_access_log.csv')
+VIEW_DF = pd.read_csv('src/data/table_access_log.csv')
 VIEW_DF['eventTime'] = pd.to_datetime(VIEW_DF['eventTime']).dt.date
 VIRTUALIZED_DATA = DV_DATA_EXCHANGE_DF["dv_table_name"].unique()
 #Graph Creation
