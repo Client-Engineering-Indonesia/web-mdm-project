@@ -4,14 +4,16 @@ import { Button, Search, Dropdown } from '@carbon/react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import DataExchangeRequestForm from './DataExchangeRequestForm';
+import { jwtDecode } from 'jwt-decode'
+
 
 const url = 'http://127.0.0.1:5000';
 
 
 function Data_Exchange() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState(null);
-    const [filteredItems, setFilteredItems] = useState([]);
+    // const [selectedFilter, setSelectedFilter] = useState(null);
+    // const [filteredItems, setFilteredItems] = useState([]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -34,10 +36,32 @@ function Data_Exchange() {
             tagId: '17'
         },
     ];
+
+    const data = [
+        {
+            table_name: 'BU_A_CUSTOMER',
+            table_schema: 'Admin',
+            type: 'Table',
+            virtualization_status: 'Success',
+            created_on: 'Jul 18, 2024 1:13 PM',
+            is_approved: true,
+            is_requested: true
+        },
+        {
+            table_name: 'BU_B_CUSTOMER',
+            table_schema: 'Admin',
+            type: 'Table',
+            virtualization_status: 'Success',
+            created_on: 'Jul 18, 2024 1:13 PM',
+            is_approved: false,
+            is_requested: false
+        },
+    ];
     
 
-    const [data, setData] = useState([]);
+    // const [data, setData] = useState([]);
     const [isToken, setIsToken] = useState(Cookies.get('web_token') || '');
+    const [decodedUsername, setDecodedUsername] = useState('');
 
     useEffect(() => {
         console.log('Token in useEffect:', isToken);
@@ -46,28 +70,33 @@ function Data_Exchange() {
     useEffect(() => {
         const token = Cookies.get('web_token');
         setIsToken(token || '');
-        fetchData();
+        if (token) {
+            const decoded = jwtDecode(token);
+            setDecodedUsername(decoded.username);
+            // You can also store other decoded information as needed
+        }
+        // fetchData();
     }, []);
 
-    const fetchData = async () => {
-        try {
-            const token = isToken;
-            const response = await axios.get(`${url}/get_assets`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                params: {
-                    webtoken: token
-                }
-            });
-            console.log(response);
-            console.log(response.data.data);
-            setData(response.data.data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
+    // const fetchData = async () => {
+    //     try {
+    //         const token = isToken;
+    //         const response = await axios.get(`${url}/get_assets`, {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': `Bearer ${token}`
+    //             },
+    //             params: {
+    //                 webtoken: token
+    //             }
+    //         });
+    //         console.log(response);
+    //         console.log(response.data.data);
+    //         setData(response.data.data);
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+    // };
     
     // State to track the submission status of each item
     const [submissionStatus, setSubmissionStatus] = useState(
@@ -80,37 +109,38 @@ function Data_Exchange() {
         const newStatus = [...submissionStatus];
         newStatus[index] = true;
         setSubmissionStatus(newStatus);
+        console.log(`Form submitted for item at index ${index}`);
     };
 
-    const ButtonComponent = ({ item, index }) => {
+    const ButtonComponent = ({ item, index, submissionStatus, toggleSidebar }) => {
         const [buttonState, setButtonState] = useState({ label: '', disabled: false, onClick: null });
     
         useEffect(() => {
-          loadButtonState();
-        }, [item, submissionStatus[index]]); // Trigger useEffect whenever item or submission status changes
+            loadButtonState();
+        }, [item, submissionStatus[index]]); // Trigger useEffect whenever item or submission status at the specific index changes
     
         const loadButtonState = () => {
-          if (submissionStatus[index]) {
-            setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
-          } else {
-            const { is_approved, is_requested } = item;
-    
-            if (is_approved === true && is_requested === true) {
-              setButtonState({ label: 'Revoke', disabled: false, onClick: null });
-            } else if (is_approved === false && is_requested === true) {
-              setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
-            } else if (is_approved === false && is_requested === false) {
-              setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
+            if (submissionStatus[index]) {
+                setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
             } else {
-              setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+                const { is_approved, is_requested } = item;
+    
+                if (is_approved === true && is_requested === true) {
+                    setButtonState({ label: 'Revoke', disabled: false, onClick: null });
+                } else if (is_approved === false && is_requested === true) {
+                    setButtonState({ label: 'Pending Approval', disabled: true, onClick: null });
+                } else if (is_approved === false && is_requested === false) {
+                    setButtonState({ label: 'Request Access', disabled: false, onClick: toggleSidebar });
+                } else {
+                    setButtonState({ label: 'Unknown State', disabled: true, onClick: null });
+                }
             }
-          }
         };
     
         return (
-          <Button kind="primary" onClick={buttonState.onClick} disabled={buttonState.disabled}>
-            {buttonState.label}
-          </Button>
+            <Button kind="primary" onClick={buttonState.onClick} disabled={buttonState.disabled}>
+                {buttonState.label}
+            </Button>
         );
     };
 
@@ -166,17 +196,31 @@ function Data_Exchange() {
                         <div key={index} className='list-detail'>
                             <p>Table Name: {item.table_name}</p>
                             <p>Table Schema: {item.table_schema}</p>
-                            <ButtonComponent item={item} />
+                            <p>Type: {item.type}</p>
+                            <p>Virtualization Status: {item.virtualization_status}</p>
+                            <p>Created On: {item.created_on}</p>
+                            {/* <p>{decodedUsername}</p> */}
+                            <p>{index}</p>
+                            <ButtonComponent 
+                                item={item} 
+                                index={index} 
+                                submissionStatus={submissionStatus} 
+                                toggleSidebar={toggleSidebar} 
+                            />
                             <DataExchangeRequestForm
                                 isOpen={isSidebarOpen}
                                 onClose={toggleSidebar}
                                 onSubmit={() => handleSubmission(index)}
+                                data= {item}
+                                // pass the decodeUsername into child
+                                decodedUsername={decodedUsername}
                             />
                         </div>
                     ))}
                 </div>
             </section>
             {/* <DataExchangeRequestForm isOpen={isSidebarOpen} onClose={toggleSidebar} onSubmit={() => handleSubmission(index)}/> */}
+
         </section>
     );
 }
