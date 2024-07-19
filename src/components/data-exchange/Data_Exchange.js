@@ -188,10 +188,10 @@ function Data_Exchange() {
                         <div key={index} className='list-detail'>
                         <p>Table Name: {item.table_name}</p>
                         <p>Table Schema: {item.table_schema}</p>
-                        <p>Type: {item.type}</p>
-                        <p>Virtualization Status: {item.virtualization_status}</p>
-                        <p>Created On: {item.created_on}</p>
-                        <p>{index}</p>
+                        {/* <p>Type: {item.type}</p> */}
+                        {/* <p>Virtualization Status: {item.virtualization_status}</p> */}
+                        {/* <p>Created On: {item.created_on}</p> */}
+                        {/* <p>{index}</p> */}
                         {item.is_approved && item.is_requested && 
                             <Button kind="primary" onClick={() => toggleSidebar(index)}>
                             Revoke
