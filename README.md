@@ -1,6 +1,17 @@
-# Getting Started with Create React App
+# MDM Web Project
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Prerequisites
+- Ubuntu VM (version 22)
+- npm 
+- docker
+
+## How to Run
+- Clone the repository
+- Run `npm i`
+- Run `sudo docker-compose up --build -d`
+- Check running containers `sudo docker ps -a`
 
 ## Available Scripts
 
