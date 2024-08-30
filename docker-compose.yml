@@ -16,6 +16,9 @@ services:
     build:
       context: .
       dockerfile: fe.Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
     ports:
       - "8080:3000"
     volumes:
