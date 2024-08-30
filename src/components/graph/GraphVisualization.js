@@ -7,7 +7,7 @@ import { ReactDiagram } from 'gojs-react';
 import Database from '../../data/database2.png';
 import Person from '../../data/person1.png';
 
-const url = 'http://52.118.170.239:8443';
+const url = 'http://162.133.113.20:8443';
 
 const formatDate = (date) => {
     console.log(date)

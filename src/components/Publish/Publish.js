@@ -16,8 +16,8 @@ import {
 } from '@carbon/react';
 import './Publish.css';
 
-// const url = 'http://52.118.170.239:8443';
-const url = 'http://52.118.170.239:8443';
+// const url = 'http://162.133.113.20:8443';
+const url = 'http://162.133.113.20:8443';
 
 const Publish = () => {
   const [selectedTable, setSelectedTable] = useState('MASTER_TABLE_1');
